@@ -8,9 +8,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Expressionate.CodeGen
+namespace Clave.Expressionify.CodeGen
 {
-    public class ExpressionateTask : Task
+    public class ExpressionifyTask : Task
     {
         [Required]
         public string ProjectPath { get; set; }
@@ -35,7 +35,7 @@ namespace Expressionate.CodeGen
                         .OfType<MethodDeclarationSyntax>()
                         .Where(m => m.AttributeLists
                             .SelectMany(l => l.Attributes)
-                            .Any(a => a.Name.ToString() == "Expressionate"));
+                            .Any(a => a.Name.ToString() == "Expressionify"));
 
                     var properties = new List<PropertyDeclarationSyntax>();
 
@@ -44,7 +44,7 @@ namespace Expressionate.CodeGen
                         if (method.ExpressionBody == null)
                         {
                             var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
-                            Log.LogError($"{path}({line}): error 0: A method with [Expressionate] attribute must have expression body");
+                            Log.LogError($"{path}({line}): error 0: A method with [Expressionify] attribute must have expression body");
                             return false;
                         }
 

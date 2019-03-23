@@ -5,14 +5,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Expressionate
+namespace Clave.Expressionify
 {
-    public class ExpressionateVisitor : ExpressionVisitor
+    public class ExpressionifyVisitor : ExpressionVisitor
     {
         private readonly IQueryProvider _provider;
         private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
 
-        internal ExpressionateVisitor(IQueryProvider provider)
+        internal ExpressionifyVisitor(IQueryProvider provider)
         {
             _provider = provider;
         }
@@ -24,14 +24,14 @@ namespace Expressionate
                 return base.VisitMethodCall(node);
             }
 
-            var shouldUseExpression = node.Method.GetCustomAttributes(typeof(ExpressionateAttribute), false).Any();
+            var shouldUseExpression = node.Method.GetCustomAttributes(typeof(ExpressionifyAttribute), false).Any();
             if (!shouldUseExpression)
             {
                 return base.VisitMethodCall(node);
             }
 
             var className = node.Method.DeclaringType.AssemblyQualifiedName;
-            var expressionClassName = GetExpressionateClassName(className);
+            var expressionClassName = GetExpressionifyClassName(className);
             var expressionClass = Type.GetType(expressionClassName);
             var properties = expressionClass.GetRuntimeProperties();
             var result = properties.First(x => x.Name == node.Method.Name).GetValue(null);
@@ -69,11 +69,11 @@ namespace Expressionate
             }
         }
 
-        public static string GetExpressionateClassName(string name)
+        public static string GetExpressionifyClassName(string name)
         {
             var parts = name.Split(',');
 
-            return $"{parts.First()}_Expressionate,{string.Join(",", parts.Skip(1))}";
+            return $"{parts.First()}_Expressionify,{string.Join(",", parts.Skip(1))}";
         }
     }
 }

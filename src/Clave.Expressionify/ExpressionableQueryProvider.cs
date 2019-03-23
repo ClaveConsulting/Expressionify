@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
-namespace Expressionate
+namespace Clave.Expressionify
 {
-  internal class ExpressionableQueryProvider : IAsyncQueryProvider
+    internal class ExpressionableQueryProvider : IAsyncQueryProvider
     {
         private readonly IQueryProvider _underlyingQueryProvider;
 
@@ -64,7 +64,7 @@ namespace Expressionate
 
         private Expression Visit(Expression exp)
         {
-            return new ExpressionateVisitor(_underlyingQueryProvider).Visit(exp);
+            return new ExpressionifyVisitor(_underlyingQueryProvider).Visit(exp);
         }
     }
 }

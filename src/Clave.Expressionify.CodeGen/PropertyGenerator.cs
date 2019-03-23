@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Expressionate.CodeGen
+namespace Clave.Expressionify.CodeGen
 {
     public static class Functionality
     {

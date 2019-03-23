@@ -1,0 +1,12 @@
+mode: Mainline
+major-version-bump-message: '\[(breaking|major)\]'
+minor-version-bump-message: '\[(feature|minor)\]'
+patch-version-bump-message: '\[(fix|patch)\]'
+branches:
+  master:
+    increment: Patch
+  hotfix:
+    tag: ''
+    increment: Patch
+ignore:
+sha: []

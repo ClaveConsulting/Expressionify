@@ -1,16 +1,12 @@
+using System;
 using System.Linq;
-using Expressionate;
+using Clave.Expressionify;
 using NUnit.Framework;
 
 namespace Tests
 {
     public class Tests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void TestExpression()
         {
@@ -21,7 +17,7 @@ namespace Tests
             };
 
             data.AsQueryable()
-                .Expressionate()
+                .Expressionify()
                 .Select(x => x.ToInt())
                 .ToList();
 
@@ -31,9 +27,9 @@ namespace Tests
         [Test]
         public void TestNaming()
         {
-            var name = ExpressionateVisitor.GetExpressionateClassName(typeof(ExtensionMethods).AssemblyQualifiedName);
+            var name = ExpressionifyVisitor.GetExpressionifyClassName(typeof(ExtensionMethods).AssemblyQualifiedName);
 
-            Assert.AreEqual("Tests.ExtensionMethods_Expressionate, Expressionate.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", name);
+            Assert.AreEqual("Tests.ExtensionMethods_Expressionify, Expressionify.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", name);
         }
     }
 }

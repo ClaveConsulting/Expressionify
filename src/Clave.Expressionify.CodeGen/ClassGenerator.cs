@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Expressionate.CodeGen
+namespace Clave.Expressionify.CodeGen
 {
     public static class ClassGenerator
     {
@@ -34,7 +34,7 @@ namespace Expressionate.CodeGen
             @namespace = @namespace.AddUsings(usings);
 
             //  Create a class: (class Order)
-            var classDeclaration = ClassDeclaration($"{className}_Expressionate");
+            var classDeclaration = ClassDeclaration($"{className}_Expressionify");
 
             // Add the public modifier: (public class Order)
             classDeclaration = classDeclaration.AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword));

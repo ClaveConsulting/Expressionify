@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <UsingTask TaskName="ExpressionateTask" AssemblyFile="../lib/netstandard2.0/Expressionate.CodeGen.dll"/>
+  <UsingTask TaskName="ExpressionifyTask" AssemblyFile="../lib/netstandard2.0/Clave.Expressionify.CodeGen.dll"/>
 
   <Target Name="GenerateExpressions" BeforeTargets="CoreCompile;PrepareResources" >
-    <ExpressionateTask ProjectPath="$(MSBuildProjectDirectory)" SourceFiles="@(Compile)">
+    <ExpressionifyTask ProjectPath="$(MSBuildProjectDirectory)" SourceFiles="@(Compile)">
       <Output ItemName="Generated" TaskParameter="GeneratedClasses" />
-    </ExpressionateTask>
+    </ExpressionifyTask>
     <ItemGroup>
       <Compile Include="@(Generated)" />
       <FileWrites Include="@(Generated)" /> <!-- For clean to work properly -->

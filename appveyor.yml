@@ -1,0 +1,47 @@
+branches:
+  only:
+  - master
+
+skip_tags: true
+
+image: Visual Studio 2017
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '$(GitVersion_MajorMinorPatch)'
+  package_version: '$(GitVersion_MajorMinorPatch)'
+  assembly_version: '$(GitVersion_MajorMinorPatch)'
+  file_version: '$(GitVersion_MajorMinorPatch)'
+  informational_version: '$(GitVersion_MajorMinorPatch)'
+
+install:
+  - choco install gitversion.portable -pre -y
+
+assembly_info:
+  patch: false
+
+before_build:
+  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+  - ps: dotnet restore
+
+build:
+  publish_nuget: true
+  verbosity: minimal
+
+after_build:
+  - ps: Get-ChildItem .\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+
+deploy:
+- provider: NuGet
+  api_key:
+    secure: tB07PzZh5PA2UE5HOXhbEkVopmU4fOOwsIEeAAJPnSr/bE7a9k2LAC7WP/Ac6pWq
+  on:
+    branch: master
+
+- provider: GitHub
+  tag: $(GitVersion_MajorMinorPatch)
+  auth_token:
+    secure: nPJh/+wrSf4Yw8C/JOnjt0fSsXPcFV80Xcjv+N5uHw7rZH2tozFBq3THcNceFkF0
+  on:
+    branch: master

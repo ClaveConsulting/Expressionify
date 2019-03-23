@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Expressionate/Expressionate.csproj" />
+    <ProjectReference Include="../../src/Clave.Expressionify/Clave.Expressionify.csproj" />
   </ItemGroup>
 
 </Project>

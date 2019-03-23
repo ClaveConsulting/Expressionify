@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3B1DEF26-D170-4DCD-8B0D-36D845932167}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expressionate", "src\Expressionate\Expressionate.csproj", "{8D60D663-B6FF-4158-AE86-E352756D001C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clave.Expressionify", "src\Clave.Expressionify\Clave.Expressionify.csproj", "{8D60D663-B6FF-4158-AE86-E352756D001C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expressionate.CodeGen", "src\Expressionate.CodeGen\Expressionate.CodeGen.csproj", "{55914630-501F-4D4E-BC40-5353FF146ED6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clave.Expressionify.CodeGen", "src\Clave.Expressionify.CodeGen\Clave.Expressionify.CodeGen.csproj", "{55914630-501F-4D4E-BC40-5353FF146ED6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4CD5351B-51D6-421B-889F-88576FA41B09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expressionate.Tests", "tests\Expressionate.Tests\Expressionate.Tests.csproj", "{E4AA7774-4C03-4883-B51A-F9171D4F27F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clave.Expressionify.Tests", "tests\Clave.Expressionify.Tests\Clave.Expressionify.Tests.csproj", "{E4AA7774-4C03-4883-B51A-F9171D4F27F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

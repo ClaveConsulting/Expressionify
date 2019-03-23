@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
-namespace Expressionate
+namespace Clave.Expressionify
 {
     internal class ExpressionableQuery<T> : IQueryable<T>, IOrderedQueryable<T>, IAsyncEnumerable<T>
     {
