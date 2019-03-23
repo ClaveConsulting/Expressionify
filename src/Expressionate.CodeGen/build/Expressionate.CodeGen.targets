@@ -3,9 +3,8 @@
   <UsingTask TaskName="ExpressionateTask" AssemblyFile="../lib/netstandard2.0/Expressionate.CodeGen.dll"/>
 
   <Target Name="GenerateExpressions" BeforeTargets="CoreCompile;PrepareResources" >
-    <Message Text="Testing" Importance="High" />
     <ExpressionateTask ProjectPath="$(MSBuildProjectDirectory)" SourceFiles="@(Compile)">
-      <!--Output ItemName="Generated" TaskParameter="GeneratedFiles" /-->
+      <Output ItemName="Generated" TaskParameter="GeneratedClasses" />
     </ExpressionateTask>
     <ItemGroup>
       <Compile Include="@(Generated)" />

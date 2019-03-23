@@ -8,7 +8,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Expressionate.CodeGen
 {
-  public static class ClassGenerator
+    public static class ClassGenerator
     {
         public static string WithOnlyTheseProperties(this SyntaxNode oldClass, IEnumerable<PropertyDeclarationSyntax> properties)
         {

@@ -19,20 +19,26 @@ namespace Expressionate.CodeGen
             return PropertyDeclaration(type, method.Identifier.ValueText)
                 .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
                 .WithAccessorList(GetOnly())
-                .WithInitializer(GetBody(method));
+                .WithInitializer(GetBody(method))
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                .WithTrailingTrivia(Whitespace("\n"));
         }
 
         private static EqualsValueClauseSyntax GetBody(MethodDeclarationSyntax method)
         {
             return EqualsValueClause(
                 ParenthesizedLambdaExpression(method.ExpressionBody.Expression)
-                    .WithParameterList(method.ParameterList));
+                    .WithParameterList(ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList()))))));
         }
 
         public static AccessorListSyntax GetOnly() =>
-            AccessorList(SingletonList(
-                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))));
+            AccessorList(
+                Token(SyntaxKind.OpenBraceToken),
+                SingletonList(
+                    AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))),
+                Token(SyntaxKind.CloseBraceToken)
+            );
 
         private static QualifiedNameSyntax GetExpressionType(IEnumerable<TypeSyntax> parameters) =>
             Expression(TypeArgumentList(

@@ -18,12 +18,14 @@ namespace Expressionate.CodeGen
         [Required]
         public string[] SourceFiles { get; set; }
 
+        [Output]
+        public string[] GeneratedClasses { get; set; }
+
         public override bool Execute()
         {
-            Log.LogMessage(MessageImportance.High, $"project: {ProjectPath}");
+            var generatedClasses = new List<string>();
             foreach (var path in SourceFiles)
             {
-                Log.LogMessage(MessageImportance.High, $"file: {path}");
                 using (var stream = File.OpenRead(path))
                 {
                     var tree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: path);
@@ -39,8 +41,6 @@ namespace Expressionate.CodeGen
 
                     foreach (var method in methods)
                     {
-                        Log.LogMessage(MessageImportance.High, $"  method: {method.Identifier.Text}");
-
                         if (method.ExpressionBody == null)
                         {
                             var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
@@ -48,19 +48,21 @@ namespace Expressionate.CodeGen
                             return false;
                         }
 
-                        var property = method.ToExpressionProperty();
-
-                        properties.Add(property);
+                        properties.Add(method.ToExpressionProperty());
                     }
+
                     if (properties.Any())
                     {
                         var newClass = root.WithOnlyTheseProperties(properties);
                         var newPath = $"{ProjectPath}/obj/CodeGen/{path}";
                         Directory.CreateDirectory(Path.GetDirectoryName(newPath));
                         File.WriteAllText(newPath, newClass);
+                        generatedClasses.Add(newPath);
                     }
                 }
             }
+
+            GeneratedClasses = generatedClasses.ToArray();
 
             return true;
         }

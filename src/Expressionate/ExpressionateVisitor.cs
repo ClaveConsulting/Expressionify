@@ -31,7 +31,8 @@ namespace Expressionate
             }
 
             var className = node.Method.DeclaringType.AssemblyQualifiedName;
-            var expressionClass = Type.GetType(GetExpressionateClassName(className));
+            var expressionClassName = GetExpressionateClassName(className);
+            var expressionClass = Type.GetType(expressionClassName);
             var properties = expressionClass.GetRuntimeProperties();
             var result = properties.First(x => x.Name == node.Method.Name).GetValue(null);
             if (result is LambdaExpression expression)
