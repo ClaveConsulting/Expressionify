@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Expressionate.CodeGen
 {
-  public class ExpressionateTask : Task
+    public class ExpressionateTask : Task
     {
         [Required]
         public string ProjectPath { get; set; }
@@ -33,7 +33,7 @@ namespace Expressionate.CodeGen
                         .OfType<MethodDeclarationSyntax>()
                         .Where(m => m.AttributeLists
                             .SelectMany(l => l.Attributes)
-                            .Any(a => a.Name.ToString() == "Expressify"));
+                            .Any(a => a.Name.ToString() == "Expressionate"));
 
                     var properties = new List<PropertyDeclarationSyntax>();
 
@@ -44,7 +44,7 @@ namespace Expressionate.CodeGen
                         if (method.ExpressionBody == null)
                         {
                             var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
-                            Log.LogError($"{path}({line}): error 0: A method with [Expressify] attribute must have expression body");
+                            Log.LogError($"{path}({line}): error 0: A method with [Expressionate] attribute must have expression body");
                             return false;
                         }
 
@@ -52,7 +52,8 @@ namespace Expressionate.CodeGen
 
                         properties.Add(property);
                     }
-                    if(properties.Any()){
+                    if (properties.Any())
+                    {
                         var newClass = root.WithOnlyTheseProperties(properties);
                         var newPath = $"{ProjectPath}/obj/CodeGen/{path}";
                         Directory.CreateDirectory(Path.GetDirectoryName(newPath));
