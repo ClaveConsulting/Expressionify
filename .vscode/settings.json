@@ -1,0 +1,9 @@
+{
+    "dotnet-test-explorer.testProjectPath": "tests/*.Tests/*.csproj",
+    "editor.codeLens": true,
+    "csharp.testsCodeLens.enabled": true,
+    "dotnet-test-explorer.showCodeLens": true,
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.detectIndentation": false
+}

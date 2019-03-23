@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expressionate", "src\Expres
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expressionate.CodeGen", "src\Expressionate.CodeGen\Expressionate.CodeGen.csproj", "{55914630-501F-4D4E-BC40-5353FF146ED6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4CD5351B-51D6-421B-889F-88576FA41B09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expressionate.Tests", "tests\Expressionate.Tests\Expressionate.Tests.csproj", "{E4AA7774-4C03-4883-B51A-F9171D4F27F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,9 +50,22 @@ Global
 		{55914630-501F-4D4E-BC40-5353FF146ED6}.Release|x64.Build.0 = Release|Any CPU
 		{55914630-501F-4D4E-BC40-5353FF146ED6}.Release|x86.ActiveCfg = Release|Any CPU
 		{55914630-501F-4D4E-BC40-5353FF146ED6}.Release|x86.Build.0 = Release|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Debug|x64.Build.0 = Debug|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Debug|x86.Build.0 = Debug|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Release|x64.ActiveCfg = Release|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Release|x64.Build.0 = Release|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Release|x86.ActiveCfg = Release|Any CPU
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8D60D663-B6FF-4158-AE86-E352756D001C} = {3B1DEF26-D170-4DCD-8B0D-36D845932167}
 		{55914630-501F-4D4E-BC40-5353FF146ED6} = {3B1DEF26-D170-4DCD-8B0D-36D845932167}
+		{E4AA7774-4C03-4883-B51A-F9171D4F27F0} = {4CD5351B-51D6-421B-889F-88576FA41B09}
 	EndGlobalSection
 EndGlobal
