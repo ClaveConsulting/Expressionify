@@ -27,6 +27,35 @@ var users = await db.Users
     .ToListAsync();
 ```
 
+## Limitations
+
+Expressionify uses the Roslyn code analyzer and generator to look for `public` `static` methods with expression bodies tagged with the `[Expressionify]` attribute.
+
+```csharp
+// ✓ OK
+[Expressionify]
+public static int ToInt(this string value) => Convert.ToInt32(value);
+
+// ❌ Not ok (it's not static)
+[Expressionify]
+public int ToInt(this string value) => Convert.ToInt32(value);
+
+// ❌ Not ok (it's missing the attribute)
+public int ToInt(this string value) => Convert.ToInt32(value);
+
+// ❌ Not ok (it's not public)
+[Expressionify]
+private static int ToInt(this string value) => Convert.ToInt32(value);
+
+// ❌ Not ok (it doesn't have an expression body)
+[Expressionify]
+public static int ToInt(this string value)
+{
+    return Convert.ToInt32(value);
+}
+```
+
+
 ## Inspiration and help
 
 The first part of this project relies heavily on the work done by [Luke McGregor](https://twitter.com/staticv0id) in his [LinqExpander](https://github.com/lukemcgregor/LinqExpander) project, as described in his article on [composable repositories - nesting expressions](https://blog.staticvoid.co.nz/2016/composable_repositories_-_nesting_extensions/), and on the updated code by [Ben Cull](https://twitter.com/BenWhoLikesBeer) in his article [Expression and Projection Magic for Entity Framework Core ](https://benjii.me/2018/01/expression-projection-magic-entity-framework-core/).
