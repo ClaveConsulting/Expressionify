@@ -29,7 +29,7 @@ namespace Tests
         {
             var name = ExpressionifyVisitor.GetExpressionifyClassName(typeof(ExtensionMethods).AssemblyQualifiedName);
 
-            Assert.AreEqual("Tests.ExtensionMethods_Expressionify, Expressionify.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", name);
+            Assert.AreEqual("Tests.ExtensionMethods_Expressionify, Clave.Expressionify.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", name);
         }
     }
 }
