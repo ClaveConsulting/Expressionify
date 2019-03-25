@@ -32,7 +32,7 @@ var users = await db.Users
 Expressionify uses the Roslyn code analyzer and generator to look for `public` `static` methods with expression bodies tagged with the `[Expressionify]` attribute.
 
 ```csharp
-// ✓ OK
+// ✔ OK
 [Expressionify]
 public static int ToInt(this string value) => Convert.ToInt32(value);
 
