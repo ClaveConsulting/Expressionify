@@ -9,4 +9,4 @@ branches:
     tag: ''
     increment: Patch
 ignore:
-sha: []
+  sha: []
