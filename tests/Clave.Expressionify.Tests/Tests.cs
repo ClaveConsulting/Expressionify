@@ -54,14 +54,14 @@ namespace Tests
             var sw = Stopwatch.StartNew();
             data.AsQueryable()
                 .Expressionify()
-                .Select(x => x.ToInt())
+                .Select(x => x.ToDouble())
                 .ToList();
             var firstTime = sw.Elapsed;
 
             sw.Restart();
             data.AsQueryable()
                 .Expressionify()
-                .Select(x => x.ToInt())
+                .Select(x => x.ToDouble())
                 .ToList();
             var secondTime = sw.Elapsed;
 
