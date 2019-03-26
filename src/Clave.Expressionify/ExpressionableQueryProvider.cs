@@ -64,7 +64,7 @@ namespace Clave.Expressionify
 
         private Expression Visit(Expression exp)
         {
-            return new ExpressionifyVisitor(_underlyingQueryProvider).Visit(exp);
+            return new ExpressionifyVisitor().Visit(exp);
         }
     }
 }
