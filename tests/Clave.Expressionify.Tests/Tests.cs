@@ -25,6 +25,23 @@ namespace Tests
         }
 
         [Test]
+        public void TestExpressionMultipleTimes()
+        {
+            var data = new[]{
+                new {a = "1", b = "5"},
+                new {a = "2", b = "5"},
+                new {a = "3", b = "5"}
+            };
+
+            data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.a.ToInt() + x.b.ToInt())
+                .ToList();
+
+            Assert.Pass();
+        }
+
+        [Test]
         public void TestNaming()
         {
             var name = ExpressionifyVisitor.GetExpressionifyClassName(typeof(ExtensionMethods).AssemblyQualifiedName);

@@ -48,6 +48,7 @@ namespace Clave.Expressionify
         {
             if (_replacements.TryGetValue(node, out Expression replacement))
             {
+                _replacements.Remove(node);
                 return Visit(replacement);
             }
 
