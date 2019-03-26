@@ -9,7 +9,7 @@ namespace Tests
     public class Tests
     {
         [Test]
-        public void TestExpression()
+        public void TestExpressionify()
         {
             var data = new[]{
                 "1",
@@ -26,7 +26,41 @@ namespace Tests
         }
 
         [Test]
-        public void TestExpressionMultipleTimes()
+        public void TestMethodParameterUsedTwice()
+        {
+            var data = new[]{
+                1,
+                2,
+                3
+            };
+
+            data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.Squared())
+                .ToList();
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void TestMethodWithMultipleArguments()
+        {
+            var data = new[]{
+                new {a = "1", b = "5"},
+                new {a = "3", b = "5"},
+                new {a = "2", b = "5"},
+            };
+
+            data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.a.Pluss(x.b))
+                .ToList();
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void TestMethodCalledMultipleTimes()
         {
             var data = new[]{
                 new {a = "1", b = "5"},
@@ -43,7 +77,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestExpressionTwice()
+        public void TestExpressionifiedTwice()
         {
             var data = new[]{
                 "1",

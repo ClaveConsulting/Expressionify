@@ -11,20 +11,22 @@ namespace Clave.Expressionify
     {
         private static readonly IDictionary<MethodInfo, object> MethodToExpressionMap = new Dictionary<MethodInfo, object>();
 
-        private LinkedListNode<Expression> _replacements;
+        private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (GetOrCreateExpression(node.Method) is LambdaExpression expression)
+            if (GetMethodExpression(node.Method) is LambdaExpression expression)
             {
-                _replacements = new LinkedList<Expression>(node.Arguments).First;
-                return Visit(expression.Body);
+                RegisterReplacementParameters(node.Arguments, expression);
+                var result = Visit(expression.Body);
+                UnregisterReplacementParameters(expression);
+                return result;
             }
 
             return base.VisitMethodCall(node);
         }
 
-        private static object GetOrCreateExpression(MethodInfo method)
+        private static object GetMethodExpression(MethodInfo method)
         {
             if (MethodToExpressionMap.TryGetValue(method, out var result))
             {
@@ -42,28 +44,40 @@ namespace Clave.Expressionify
                 return MethodToExpressionMap[method] = false;
             }
 
-            return MethodToExpressionMap[method] = GetMethodExpression(method);
-        }
-
-        private static object GetMethodExpression(MethodInfo method)
-        {
             var className = method.DeclaringType.AssemblyQualifiedName;
             var expressionClassName = GetExpressionifyClassName(className);
             var expressionClass = Type.GetType(expressionClassName);
             var properties = expressionClass.GetRuntimeProperties();
-            return properties.First(x => x.Name == method.Name).GetValue(null);
+            return MethodToExpressionMap[method] = properties.First(x => x.Name == method.Name).GetValue(null);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (_replacements != null)
+            if (_replacements.TryGetValue(node, out Expression replacement))
             {
-                var replacement = _replacements.Value;
-                _replacements = _replacements.Next;
                 return Visit(replacement);
             }
 
             return base.VisitParameter(node);
+        }
+
+        private void RegisterReplacementParameters(IReadOnlyList<Expression> parameterValues, LambdaExpression expressionToVisit)
+        {
+            if (parameterValues.Count != expressionToVisit.Parameters.Count)
+                throw new ArgumentException($"The parameter values count ({parameterValues.Count}) does not match the expression parameter count ({expressionToVisit.Parameters.Count})");
+
+            foreach (var (p, v) in expressionToVisit.Parameters.Zip(parameterValues, ValueTuple.Create))
+            {
+                _replacements.Add(p, v);
+            }
+        }
+
+        private void UnregisterReplacementParameters(LambdaExpression expressionToVisit)
+        {
+            foreach (var p in expressionToVisit.Parameters)
+            {
+                _replacements.Remove(p);
+            }
         }
 
         public static string GetExpressionifyClassName(string name)
