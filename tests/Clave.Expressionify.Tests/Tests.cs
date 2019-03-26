@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Clave.Expressionify;
 using NUnit.Framework;
@@ -39,6 +40,32 @@ namespace Tests
                 .ToList();
 
             Assert.Pass();
+        }
+
+        [Test]
+        public void TestExpressionTwice()
+        {
+            var data = new[]{
+                "1",
+                "2",
+                "3"
+            };
+
+            var sw = Stopwatch.StartNew();
+            data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.ToInt())
+                .ToList();
+            var firstTime = sw.Elapsed;
+
+            sw.Restart();
+            data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.ToInt())
+                .ToList();
+            var secondTime = sw.Elapsed;
+
+            Assert.Less(secondTime, firstTime);
         }
 
         [Test]

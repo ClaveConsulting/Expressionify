@@ -9,7 +9,10 @@ namespace Clave.Expressionify
 {
     public class ExpressionifyVisitor : ExpressionVisitor
     {
+        private static readonly IDictionary<MethodInfo, object> MethodToExpressionMap = new Dictionary<MethodInfo, object>();
+
         private readonly IQueryProvider _provider;
+
         private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
 
         internal ExpressionifyVisitor(IQueryProvider provider)
@@ -30,18 +33,27 @@ namespace Clave.Expressionify
                 return base.VisitMethodCall(node);
             }
 
-            var className = node.Method.DeclaringType.AssemblyQualifiedName;
-            var expressionClassName = GetExpressionifyClassName(className);
-            var expressionClass = Type.GetType(expressionClassName);
-            var properties = expressionClass.GetRuntimeProperties();
-            var result = properties.First(x => x.Name == node.Method.Name).GetValue(null);
-            if (result is LambdaExpression expression)
+            if (GetMethodExpression(node.Method) is LambdaExpression expression)
             {
                 RegisterReplacementParameters(node.Arguments.ToArray(), expression);
                 return Visit(expression.Body);
             }
 
-            return base.VisitMethodCall(node);
+            throw new Exception("Property marked with [Expressionify] must be of type Expression<Func<>>");
+        }
+
+        private static object GetMethodExpression(MethodInfo method)
+        {
+            if (MethodToExpressionMap.TryGetValue(method, out var result))
+            {
+                return result;
+            }
+
+            var className = method.DeclaringType.AssemblyQualifiedName;
+            var expressionClassName = GetExpressionifyClassName(className);
+            var expressionClass = Type.GetType(expressionClassName);
+            var properties = expressionClass.GetRuntimeProperties();
+            return MethodToExpressionMap[method] = properties.First(x => x.Name == method.Name).GetValue(null);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
@@ -58,15 +70,15 @@ namespace Clave.Expressionify
         private void RegisterReplacementParameters(Expression[] parameterValues, LambdaExpression expressionToVisit)
         {
             if (parameterValues.Length != expressionToVisit.Parameters.Count)
-                throw new ArgumentException(string.Format("The parameter values count ({0}) does not match the expression parameter count ({1})", parameterValues.Length, expressionToVisit.Parameters.Count));
+                throw new ArgumentException($"The parameter values count ({parameterValues.Length}) does not match the expression parameter count ({expressionToVisit.Parameters.Count})");
 
-            foreach (var (idx, p) in expressionToVisit.Parameters.Select((p, idx) => (idx, p)))
+            foreach (var (p, v) in expressionToVisit.Parameters.Zip(parameterValues, ValueTuple.Create))
             {
                 if (_replacements.ContainsKey(p))
                 {
                     throw new Exception("Parameter already registered, this shouldn't happen.");
                 }
-                _replacements.Add(p, parameterValues[idx]);
+                _replacements.Add(p, v);
             }
         }
 
