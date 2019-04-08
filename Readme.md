@@ -4,26 +4,56 @@
 
 ## How to use
 
-1) Install the two nuget packages `Clave.Expressionify` and `Clave.Expressionify.CodeGen`
-2) Mark the `public static` extension method with `[Expressionify]`.
-3) Call `.Expressionify()` at the beginning of the EF query.
+1) Install the two nuget packages `Clave.Expressionify` and `Clave.Expressionify.Tasks`
+2) Mark the `public static` extension method with the `[Expressionify]` attribute.
+3) Call `.Expressionify()` at the beginning of the Entity Framework query.
 4) Use the extension method in the query
 
 ## Example
 
+Lets say you have this code:
+
+```csharp
+var users = await db.Users
+    .Where(user => user.DateOfBirth < DateTime.Now.AddYears(-18))
+    .ToListAsync();
+```
+
+That second line is a bit long, so it would be nice to pull it out as a reusable extension method:
+
 ```csharp
 public static Extensions
 {
-    // This extension method will be expressionified
-    [Expressionify]
     public static bool IsOver18(this User user)
         => user.DateOfBirth < DateTime.Now.AddYears(-18);
 }
 
+// ...
+
+var users = await db.Users
+    .Where(user => user.IsOver18())
+    .ToListAsync();
+
+```
+
+Unfortunately this forces Entity Framework to run the query in memory, rather than in the database. That's not very efficient...
+
+But, with just two additional lines of code we can get Entity Framework to understand how translate our extension method to SQL
+
+```diff
+public static Extensions
+{
++    [Expressionify]
+    public static bool IsOver18(this User user)
+        => user.DateOfBirth < DateTime.Now.AddYears(-18);
+}
+
+// ...
+
 // create a query
 var users = await db.Users
-    .Expressionify() // This adds the magic...
-    .Where(user => user.IsOver18()) // ...so we can use the method
++    .Expressionify()
+    .Where(user => user.IsOver18())
     .ToListAsync();
 ```
 

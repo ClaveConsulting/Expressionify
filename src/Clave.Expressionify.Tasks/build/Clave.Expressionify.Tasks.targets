@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <UsingTask TaskName="ExpressionifyTask" AssemblyFile="../lib/netstandard2.0/Clave.Expressionify.CodeGen.dll"/>
 
   <Target Name="GenerateExpressions" BeforeTargets="CoreCompile;PrepareResources" >
-    <ExpressionifyTask ProjectPath="$(MSBuildProjectDirectory)" SourceFiles="@(Compile)">
-      <Output ItemName="Generated" TaskParameter="GeneratedClasses" />
-    </ExpressionifyTask>
+    <Exec Command="dotnet expressionify &quot;$(MSBuildProjectDirectory)&quot; &quot;@(Compile)&quot;" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" ItemName="Generated" />
+    </Exec>
     <ItemGroup>
       <Compile Include="@(Generated)" />
       <FileWrites Include="@(Generated)" /> <!-- For clean to work properly -->
     </ItemGroup>
   </Target>
+
 </Project>

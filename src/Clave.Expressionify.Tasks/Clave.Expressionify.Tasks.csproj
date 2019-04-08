@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <DebugType>embedded</DebugType>
+    <LangVersion>latest</LangVersion>
+    <VersionPrefix>0.3.0</VersionPrefix>
+    <BeforePack>SetPackageVersionInProps;$(BeforePack)</BeforePack>
+    <PropsFileName>Clave.Expressionify.Tasks.props</PropsFileName>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>Clave.Expressionify.Tasks</Title>
+    <PackageIconUrl>https://raw.githubusercontent.com/ClaveConsulting/logo/master/png/logo_noText.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/ClaveConsulting/Expressionify</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ClaveConsulting/Expressionify</PackageProjectUrl>
+    <Authors>Clave Consulting</Authors>
+    <Description>Use extension methods in Entity Framework Core queries</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="build\**">
+      <Pack>true</Pack>
+      <PackagePath>build\%(RecursiveDir)%(FileName)%(Extension)</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="build\$(PropsFileName)">
+      <Pack>false</Pack>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <PackageReference>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+
+  <Target Name="SetPackageVersionInProps">
+    <PropertyGroup>
+      <PropsFileDestinationDirectory>$(IntermediateOutputPath)build\</PropsFileDestinationDirectory>
+      <PropsFilePath>$(PropsFileDestinationDirectory)\$(PropsFileName)</PropsFilePath>
+      <_ProjectNamespaces>
+        <Namespace Prefix="dn" Uri="http://schemas.microsoft.com/developer/msbuild/2003" />
+      </_ProjectNamespaces>
+    </PropertyGroup>
+    <MakeDir Directories="$(PropsFileDestinationDirectory)" />
+    <Copy SourceFiles="build\$(PropsFileName)" DestinationFiles="$(PropsFilePath)" />
+    <XmlPoke XmlInputPath="$(PropsFilePath)" Value="$(PackageVersion)" Query="/dn:Project/dn:ItemGroup/dn:DotNetCliToolReference/@Version" Namespaces="$(_ProjectNamespaces)" />
+    <ItemGroup>
+      <None Include="$(PropsFilePath)">
+        <Pack>true</Pack>
+        <PackagePath>build\</PackagePath>
+      </None>
+    </ItemGroup>
+  </Target>
+
+</Project>
