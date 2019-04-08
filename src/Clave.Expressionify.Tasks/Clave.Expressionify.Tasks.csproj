@@ -5,7 +5,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <DebugType>embedded</DebugType>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <Version>0.3.0</Version>
     <BeforePack>SetPackageVersionInProps;$(BeforePack)</BeforePack>
     <PropsFileName>Clave.Expressionify.Tasks.props</PropsFileName>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -20,7 +20,7 @@
     <Description>Use extension methods in Entity Framework Core queries</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <None Include="build\**">
       <Pack>true</Pack>

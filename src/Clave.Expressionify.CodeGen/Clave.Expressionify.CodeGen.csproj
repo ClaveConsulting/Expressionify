@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <DebugType>embedded</DebugType>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <Version>0.3.0</Version>
     <AssemblyName>dotnet-expressionify</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageType>DotnetCliTool</PackageType>
