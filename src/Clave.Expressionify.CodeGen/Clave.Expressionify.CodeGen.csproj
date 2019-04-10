@@ -2,13 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <DebugType>embedded</DebugType>
     <LangVersion>latest</LangVersion>
     <Version>0.3.0</Version>
     <AssemblyName>dotnet-expressionify</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageType>DotnetCliTool</PackageType>
+    <DisableImplicitAssetTargetFallback>false</DisableImplicitAssetTargetFallback>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="prefercliruntime" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.0.0" />
