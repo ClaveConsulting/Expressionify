@@ -13,7 +13,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4CD5351B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clave.Expressionify.Tests", "tests\Clave.Expressionify.Tests\Clave.Expressionify.Tests.csproj", "{E4AA7774-4C03-4883-B51A-F9171D4F27F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clave.Expressionify.Tasks", "src\Clave.Expressionify.Tasks\Clave.Expressionify.Tasks.csproj", "{BDB14E4F-79CD-4A3D-B1CB-EE4655E74C9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clave.Expressionify.Tasks", "src\Clave.Expressionify.Tasks\Clave.Expressionify.Tasks.csproj", "{BDB14E4F-79CD-4A3D-B1CB-EE4655E74C9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{942AA318-76C0-464F-9ECA-51F55157A1F5}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		GitVersion.yml = GitVersion.yml
+		Readme.md = Readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

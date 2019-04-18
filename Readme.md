@@ -1,13 +1,31 @@
 # Epressionify
 
+![Clave.Expressionify](https://img.shields.io/nuget/v/Clave.Expressionify.svg)! [Clave.Expressionify.Tasks](https://img.shields.io/nuget/v/Clave.Expressionify.Tasks.svg)
+
 > Use extension methods in Entity Framework Core queries
+
+## Installing
+
+Add the following to your csproj file:
+
+```xml
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-expressionify" Version="0.4.0" />
+    <PackageReference Include="Clave.Expressionify" Version="0.4.0" />
+    <PackageReference Include="Clave.Expressionify.Tasks" Version="0.4.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+```
+
+This is equivalent to installing the two nuget packages `Clave.Expressionify` and `Clave.Expresionify.Tasks` and manually adding the DotNetCliTool `dotnet-expressionify`.
 
 ## How to use
 
-1) Install the two nuget packages `Clave.Expressionify` and `Clave.Expressionify.Tasks`
-2) Mark the `public static` extension method with the `[Expressionify]` attribute.
-3) Call `.Expressionify()` at the beginning of the Entity Framework query.
-4) Use the extension method in the query
+1) Mark the `public static` extension method with the `[Expressionify]` attribute.
+2) Call `.Expressionify()` in your Entity Framework query chain, before using any extension method.
+3) Use the extension method in the query
 
 ## Example
 
@@ -43,7 +61,7 @@ But, with just two additional lines of code we can get Entity Framework to under
 ```diff
 public static Extensions
 {
-+    [Expressionify]
++   [Expressionify]
     public static bool IsOver18(this User user)
         => user.DateOfBirth < DateTime.Now.AddYears(-18);
 }
@@ -52,7 +70,7 @@ public static Extensions
 
 // create a query
 var users = await db.Users
-+    .Expressionify()
++   .Expressionify()
     .Where(user => user.IsOver18())
     .ToListAsync();
 ```

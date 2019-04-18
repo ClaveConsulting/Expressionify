@@ -3,29 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Clave.Expressionify
 {
-    internal class ExpressionableQuery<T> : IQueryable<T>, IOrderedQueryable<T>, IAsyncEnumerable<T>
+    public class ExpressionableQuery<T> : IQueryable<T>, IOrderedQueryable<T>, IAsyncEnumerable<T>
     {
         private readonly ExpressionableQueryProvider _provider;
-        private readonly Expression _expression;
 
         public ExpressionableQuery(ExpressionableQueryProvider provider, Expression expression)
         {
             _provider = provider;
-            _expression = expression;
+            Expression = expression;
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _provider.ExecuteQuery<T>(_expression).GetEnumerator();
+            return _provider.ExecuteQuery<T>(Expression).GetEnumerator();
         }
 
         IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
         {
-            return _provider.ExecuteAsync<T>(_expression).GetEnumerator();
+            return _provider.ExecuteAsync<T>(Expression).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -35,7 +33,7 @@ namespace Clave.Expressionify
 
         public Type ElementType => typeof(T);
 
-        public Expression Expression => _expression;
+        public Expression Expression { get; }
 
         public IQueryProvider Provider => _provider;
     }

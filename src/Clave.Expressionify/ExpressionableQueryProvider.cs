@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Clave.Expressionify
 {
-    internal class ExpressionableQueryProvider : IAsyncQueryProvider
+    public class ExpressionableQueryProvider : IAsyncQueryProvider
     {
         private readonly IQueryProvider _underlyingQueryProvider;
 
-        internal ExpressionableQueryProvider(IQueryProvider underlyingQueryProvider)
+        public ExpressionableQueryProvider(IQueryProvider underlyingQueryProvider)
         {
             _underlyingQueryProvider = underlyingQueryProvider;
         }
