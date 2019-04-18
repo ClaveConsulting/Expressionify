@@ -1,6 +1,6 @@
 # Epressionify
 
-![Clave.Expressionify](https://img.shields.io/nuget/v/Clave.Expressionify.svg)! [Clave.Expressionify.Tasks](https://img.shields.io/nuget/v/Clave.Expressionify.Tasks.svg)
+[![Clave.Expressionify](https://img.shields.io/nuget/v/Clave.Expressionify.svg?label=Clave.Expressionify)](https://www.nuget.org/packages/Clave.Expressionify/)[![Clave.Expressionify.Tasks](https://img.shields.io/nuget/v/Clave.Expressionify.Tasks.svg?label=Clave.Expressionify.Tasks)](https://www.nuget.org/packages/Clave.Expressionify.Tasks/)
 
 > Use extension methods in Entity Framework Core queries
 
