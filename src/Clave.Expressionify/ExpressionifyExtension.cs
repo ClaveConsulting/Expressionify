@@ -18,14 +18,14 @@ Change the order so that Expressionify() is called after all calls to Include() 
         /// <typeparam name="T">the type of the queryable</typeparam>
         /// <param name="source">The input queryable</param>
         /// <returns>A queryable which has any of the tagged extension methods replaced.</returns>
-        public static IQueryable<T> Expressionify<T>(this IQueryable<T> source)
+        public static ExpressionableQuery<T> Expressionify<T>(this IQueryable<T> source)
         {
             if (source is ExpressionableQuery<T> result)
             {
                 return result;
             }
 
-            return new ExpressionableQueryProvider(source.Provider).CreateQuery<T>(source.Expression);
+            return new ExpressionableQuery<T>(new ExpressionableQueryProvider(source.Provider), source.Expression);
         }
 
         /// <summary>
