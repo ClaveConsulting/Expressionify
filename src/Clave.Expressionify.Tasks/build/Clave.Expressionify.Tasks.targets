@@ -6,8 +6,8 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="Generated" />
     </Exec>
     <ItemGroup>
-      <Compile Include="@(Generated)" />
-      <FileWrites Include="@(Generated)" /> <!-- For clean to work properly -->
+      <Compile Include="$(Generated)" />
+      <FileWrites Include="$(Generated)" /> <!-- For clean to work properly -->
     </ItemGroup>
   </Target>
 

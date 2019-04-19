@@ -15,7 +15,6 @@ namespace Clave.Expressionify.CodeGen
             var projectPath = args[0];
             var sourceFiles = args.Skip(1).FirstOrDefault()?.Split(';');
 
-            var generatedClasses = new List<string>();
             foreach (var path in sourceFiles)
             {
                 using (var stream = File.OpenRead(path))
@@ -46,15 +45,13 @@ namespace Clave.Expressionify.CodeGen
                     if (properties.Any())
                     {
                         var newClass = root.WithOnlyTheseProperties(properties);
-                        var newPath = $"{projectPath}/obj/CodeGen/{path}";
+                        var newPath = $@"{projectPath}\obj\CodeGen\{path}";
                         Directory.CreateDirectory(Path.GetDirectoryName(newPath));
                         File.WriteAllText(newPath, newClass);
-                        generatedClasses.Add(newPath);
+                        Console.WriteLine(newPath);
                     }
                 }
             }
-
-            Console.WriteLine(string.Join(";", generatedClasses));
 
             return 0;
         }

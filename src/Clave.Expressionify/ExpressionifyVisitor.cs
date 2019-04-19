@@ -46,6 +46,11 @@ namespace Clave.Expressionify
             var className = method.DeclaringType.AssemblyQualifiedName;
             var expressionClassName = GetExpressionifyClassName(className);
             var expressionClass = Type.GetType(expressionClassName);
+            if(expressionClass == null)
+            {
+                throw new Exception($"Could not find type {expressionClassName} containing the expressionified method {method.Name}");
+            }
+
             var properties = expressionClass.GetRuntimeProperties();
             return MethodToExpressionMap[method] = properties.First(x => x.Name == method.Name).GetValue(null);
         }
