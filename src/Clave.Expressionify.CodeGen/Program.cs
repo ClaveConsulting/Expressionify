@@ -45,7 +45,7 @@ namespace Clave.Expressionify.CodeGen
                     if (properties.Any())
                     {
                         var newClass = root.WithOnlyTheseProperties(properties);
-                        var newPath = $@"{projectPath}\obj\CodeGen\{path}";
+                        var newPath = Path.Combine(projectPath, "obj", "CodeGen", path);
                         Directory.CreateDirectory(Path.GetDirectoryName(newPath));
                         File.WriteAllText(newPath, newClass);
                         Console.WriteLine(newPath);
