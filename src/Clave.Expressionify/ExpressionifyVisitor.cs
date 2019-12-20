@@ -43,9 +43,9 @@ namespace Clave.Expressionify
                 return MethodToExpressionMap[method] = false;
             }
 
-            var className = method.DeclaringType.AssemblyQualifiedName;
+            var className = method.DeclaringType.Name;
             var expressionClassName = GetExpressionifyClassName(className);
-            var expressionClass = Type.GetType(expressionClassName);
+            var expressionClass = method.DeclaringType.Assembly.ExportedTypes.FirstOrDefault(t => t.Name == expressionClassName);
             if(expressionClass == null)
             {
                 throw new Exception($"Could not find type {expressionClassName} containing the expressionified method {method.Name}");
@@ -86,9 +86,7 @@ namespace Clave.Expressionify
 
         public static string GetExpressionifyClassName(string name)
         {
-            var parts = name.Split(',');
-
-            return $"{parts.First()}_Expressionify,{string.Join(",", parts.Skip(1))}";
+            return $"{name}_Expressionify";
         }
     }
 }

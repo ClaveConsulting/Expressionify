@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace Clave.Expressionify
 {
-    public class ExpressionableQuery<T> : IQueryable<T>, IOrderedQueryable<T>, IAsyncEnumerable<T>
+    public class ExpressionableQuery<T> : IQueryable<T>
     {
         private readonly ExpressionableQueryProvider _provider;
 
@@ -16,19 +16,14 @@ namespace Clave.Expressionify
             Expression = expression;
         }
 
-        public IEnumerator<T> GetEnumerator()
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return _provider.ExecuteQuery<T>(Expression).GetEnumerator();
         }
 
-        IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
-        {
-            return _provider.ExecuteAsync<T>(Expression).GetEnumerator();
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return _provider.ExecuteQuery<T>(Expression).GetEnumerator();
         }
 
         public Type ElementType => typeof(T);

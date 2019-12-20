@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Clave.Expressionify
@@ -52,14 +51,16 @@ namespace Clave.Expressionify
             return _underlyingQueryProvider.Execute(Visit(expression));
         }
 
-        public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
+        public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
-            return ((IAsyncQueryProvider)_underlyingQueryProvider).ExecuteAsync<TResult>(Visit(expression));
-        }
+            if(_underlyingQueryProvider is IAsyncQueryProvider provider)
+            {
+#pragma warning disable EF1001 // Internal EF Core API usage.
+                return provider.ExecuteAsync<TResult>(Visit(expression), cancellationToken);
+#pragma warning restore EF1001 // Internal EF Core API usage.
+            }
 
-        public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-        {
-            return ((IAsyncQueryProvider)_underlyingQueryProvider).ExecuteAsync<TResult>(Visit(expression), cancellationToken);
+            throw new Exception("This shouldn't happen");
         }
 
         private Expression Visit(Expression exp)

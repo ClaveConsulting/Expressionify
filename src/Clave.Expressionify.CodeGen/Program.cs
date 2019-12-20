@@ -39,6 +39,13 @@ namespace Clave.Expressionify.CodeGen
                             return 1;
                         }
 
+                        if (method.Modifiers.FirstOrDefault(m => m.Kind() == SyntaxKind.StaticKeyword) == null)
+                        {
+                            var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
+                            Console.Error.WriteLine($"{path}({line}): error 0: A method with [Expressionify] attribute must be static. Make it an extension method if you need to use properties of the object");
+                            return 1;
+                        }
+
                         properties.Add(method.ToExpressionProperty());
                     }
 
