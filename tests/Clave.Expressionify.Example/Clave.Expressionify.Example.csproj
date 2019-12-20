@@ -19,4 +19,8 @@
     <ProjectReference Include="..\..\src\Clave.Expressionify\Clave.Expressionify.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-expressionify" Version="0.4.5" />
+  </ItemGroup>
+
 </Project>
