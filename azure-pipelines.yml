@@ -11,17 +11,31 @@ steps:
   - checkout: self
     clean: true
     persistCredentials: true
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk 3.1.100'
+    inputs:
+        packageType: sdk
+        version: 3.1.100
+        installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: NuGetToolInstaller@1
     displayName: 'install latest nuget'
     inputs:
       checkLatest: true
 
-  - task: GitVersion@5
-    displayName: 'GitVersion'
+  - task: DotNetCoreCLI@2
+    displayName: 'Install gitversion'
     inputs:
-      updateAssemblyInfo: true
-      preferBundledVersion: false
+      command: 'custom'
+      custom: 'tool'
+      arguments: 'install -g gitversion.tool'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Gitversion'
+    inputs:
+      command: 'custom'
+      custom: 'gitversion'
+      arguments: '/output buildserver'
 
   - script: echo %Action%%BuildVersion%
     displayName: 'Set build version'
