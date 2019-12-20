@@ -1,12 +1,14 @@
-mode: Mainline
+mode: ContinuousDelivery
 major-version-bump-message: '\[(breaking|major)\]'
 minor-version-bump-message: '\[(feature|minor)\]'
 patch-version-bump-message: '\[(fix|patch)\]'
+no-bump-message: '\[(none|skip)\]'
+
+next-version: 1.0.0
+
 branches:
   master:
-    increment: Patch
-  hotfix:
-    tag: ''
-    increment: Patch
+    mode: ContinuousDelivery
+    increment: Minor
 ignore:
   sha: []
