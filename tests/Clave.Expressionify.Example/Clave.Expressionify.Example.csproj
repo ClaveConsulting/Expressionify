@@ -7,15 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Clave.Expressionify.Tasks" Version="0.4.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\src\Clave.Expressionify\Clave.Expressionify.Tasks.csproj" />
     <ProjectReference Include="..\..\src\Clave.Expressionify\Clave.Expressionify.csproj" />
   </ItemGroup>
 
