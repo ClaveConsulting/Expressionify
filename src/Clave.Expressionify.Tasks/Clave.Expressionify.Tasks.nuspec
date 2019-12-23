@@ -3,13 +3,13 @@
   <metadata>
     <id>Clave.Expressionify.Tasks</id>
     <title>Clave.Expressionify.Tasks</title>
-    <PackageIconUrl>https://raw.githubusercontent.com/ClaveConsulting/logo/master/png/logo_noText.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/ClaveConsulting/Expressionify</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/ClaveConsulting/Expressionify</PackageProjectUrl>
+    <iconUrl>https://raw.githubusercontent.com/ClaveConsulting/logo/master/png/logo_noText.png</iconUrl>
+    <repository type="git" url="https://github.com/ClaveConsulting/Expressionify.git" />
+    <projectUrl>https://github.com/ClaveConsulting/Expressionify</projectUrl>
     <authors>Clave Consulting</authors>
     <description>Use extension methods in Entity Framework Core queries</description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <version>0.5.4</version>
+    <licenseExpression>MIT</licenseExpression>
+    <version>$version$</version>
   </metadata>
   <files>
     <file src="_._" target="lib/netstandard2.1/" />

@@ -18,7 +18,7 @@
     <NuspecFile>Clave.Expressionify.Tasks.nuspec</NuspecFile>
     <IntermediatePackDir>$(MSBuildProjectDirectory)/bin/$(Configuration)/publish/</IntermediatePackDir>
     <PublishDir>$(IntermediatePackDir)$(TargetFramework)/</PublishDir>
-    <NuspecProperties>publishDir=$([MSBuild]::NormalizeDirectory($(IntermediatePackDir)))</NuspecProperties>
+    <NuspecProperties>publishDir=$([MSBuild]::NormalizeDirectory($(IntermediatePackDir)));version=$(Version)</NuspecProperties>
   </PropertyGroup>
 
   <!-- Executes /t:Publish for all target frameworks before packing-->
