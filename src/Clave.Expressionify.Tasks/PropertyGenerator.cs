@@ -26,8 +26,11 @@ namespace Clave.Expressionify.CodeGen
         private static EqualsValueClauseSyntax GetBody(MethodDeclarationSyntax method)
         {
             return EqualsValueClause(
-                ParenthesizedLambdaExpression(method.ExpressionBody.Expression)
-                    .WithParameterList(ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList()))))));
+                ParenthesizedLambdaExpression(
+                    ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList())))),
+                    method.ExpressionBody.Expression
+                )
+            );
         }
 
         public static AccessorListSyntax GetOnly() =>
