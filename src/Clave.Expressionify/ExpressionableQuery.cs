@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace Clave.Expressionify
 {
-    public class ExpressionableQuery<T> : IQueryable<T>
+    public class ExpressionableQuery<T> : IQueryable<T>, IOrderedQueryable<T>, IAsyncEnumerable<T>
     {
         private readonly ExpressionableQueryProvider _provider;
 
@@ -24,6 +25,11 @@ namespace Clave.Expressionify
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _provider.ExecuteQuery<T>(Expression).GetEnumerator();
+        }
+
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        {
+            return _provider.ExecuteQueryAsync<T>(Expression).GetAsyncEnumerator(cancellationToken);
         }
 
         public Type ElementType => typeof(T);

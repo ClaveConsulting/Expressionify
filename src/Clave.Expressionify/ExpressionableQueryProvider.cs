@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Clave.Expressionify
@@ -39,6 +40,11 @@ namespace Clave.Expressionify
         internal IEnumerable<T> ExecuteQuery<T>(Expression expression)
         {
             return _underlyingQueryProvider.CreateQuery<T>(Visit(expression)).AsEnumerable();
+        }
+
+        internal IAsyncEnumerable<T> ExecuteQueryAsync<T>(Expression expression)
+        {
+            return _underlyingQueryProvider.CreateQuery<T>(Visit(expression)).AsAsyncEnumerable();
         }
 
         public TResult Execute<TResult>(Expression expression)
