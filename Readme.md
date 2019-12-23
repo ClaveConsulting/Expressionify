@@ -6,20 +6,10 @@
 
 ## Installing
 
-Add the following to your csproj file:
+Install these two nuget packages:
 
-```xml
-  <ItemGroup>
-    <DotNetCliToolReference Include="dotnet-expressionify" Version="1.0.0" />
-    <PackageReference Include="Clave.Expressionify" Version="1.0.0" />
-    <PackageReference Include="Clave.Expressionify.Tasks" Version="1.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-```
-
-This is equivalent to installing the two nuget packages `Clave.Expressionify` and `Clave.Expresionify.Tasks` and manually adding the DotNetCliTool `dotnet-expressionify`.
+* `Clave.Expressionify`
+* `Clave.Expressionify.Tasks`
 
 ## How to use
 
