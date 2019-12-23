@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Target Name="GenerateExpressions" BeforeTargets="CoreCompile;PrepareResources" >
-    <Exec Command="dotnet expressionify &quot;$(MSBuildProjectDirectory)&quot; &quot;@(Compile)&quot;" ConsoleToMSBuild="true">
+    <Exec Command="dotnet &quot;$(MSBuildThisFileDirectory)/netcoreapp3.1/Clave.Expressionify.Tasks.dll&quot; &quot;$(MSBuildProjectDirectory)&quot; &quot;@(Compile)&quot;" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="Generated" />
     </Exec>
     <ItemGroup>
