@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Clave.Expressionify;
+using Clave.Expressionify.Tests.First;
 using NUnit.Framework;
 
 namespace Tests

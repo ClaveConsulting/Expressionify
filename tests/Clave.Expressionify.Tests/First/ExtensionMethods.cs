@@ -1,8 +1,7 @@
 using System;
 using System.Linq.Expressions;
-using Clave.Expressionify;
 
-namespace Tests
+namespace Clave.Expressionify.Tests.First
 {
     public static class ExtensionMethods
     {

@@ -45,14 +45,18 @@ namespace Clave.Expressionify
 
             var className = method.DeclaringType.Name;
             var expressionClassName = GetExpressionifyClassName(className);
-            var expressionClass = method.DeclaringType.Assembly.ExportedTypes.FirstOrDefault(t => t.Name == expressionClassName);
+            var expressionClass = method.DeclaringType.Assembly.ExportedTypes
+                .Where(t => t.Namespace == method.DeclaringType.Namespace)
+                .FirstOrDefault(t => t.Name == expressionClassName);
             if(expressionClass == null)
             {
                 throw new Exception($"Could not find type {expressionClassName} containing the expressionified method {method.Name}");
             }
 
             var properties = expressionClass.GetRuntimeProperties();
-            return MethodToExpressionMap[method] = properties.First(x => x.Name == method.Name).GetValue(null);
+            return MethodToExpressionMap[method] = properties
+                .First(x => x.Name == method.Name)
+                .GetValue(null);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
