@@ -5,42 +5,39 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Clave.Expressionify.CodeGen
+namespace Clave.Expressionify.Tasks
 {
     public static class ClassGenerator
     {
-        public static string WithOnlyTheseProperties(this SyntaxNode oldClass, IEnumerable<PropertyDeclarationSyntax> properties)
+        public static ClassDeclarationSyntax WithOnlyTheseProperties(this ClassDeclarationSyntax oldClass, IEnumerable<PropertyDeclarationSyntax> properties)
         {
-            var namespaceName = oldClass.DescendantNodes()
+            var className = oldClass.Identifier.Text;
+
+            // Add the public modifier: (public class Order)
+            return ClassDeclaration($"{className}_Expressionify")
+                .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
+                .AddMembers(properties.ToArray());
+        }
+
+        public static string WithOnlyTheseClasses(this SyntaxNode root, params ClassDeclarationSyntax[] classes)
+        {
+            var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
                 .First()
                 .Name;
 
-            var usings = oldClass.DescendantNodes()
+            var usings = root.DescendantNodes()
                 .OfType<UsingDirectiveSyntax>()
                 .ToArray();
 
-            var className = oldClass.DescendantNodes()
-                .OfType<ClassDeclarationSyntax>()
-                .First()
-                .Identifier
-                .Text;
 
             // Create a namespace: (namespace CodeGenerationSample)
             var @namespace = NamespaceDeclaration(namespaceName).NormalizeWhitespace();
 
             // Add System using statement: (using System)
             @namespace = @namespace.AddUsings(usings);
-
-            //  Create a class: (class Order)
-            var classDeclaration = ClassDeclaration($"{className}_Expressionify");
-
-            // Add the public modifier: (public class Order)
-            classDeclaration = classDeclaration.AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword));
-
-            classDeclaration = classDeclaration.AddMembers(properties.ToArray());
-
-            @namespace = @namespace.AddMembers(classDeclaration);
+            
+            @namespace = @namespace.AddMembers(classes);
 
             return @namespace
                 .NormalizeWhitespace()

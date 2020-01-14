@@ -54,9 +54,14 @@ namespace Clave.Expressionify
             }
 
             var properties = expressionClass.GetRuntimeProperties();
-            return MethodToExpressionMap[method] = properties
-                .First(x => x.Name == method.Name)
+            var expression = properties
+                .Where(x => x.Name.StartsWith(method.Name))
+                .Where(x => x.MatchesTypeOf(method))
+                .First()
                 .GetValue(null);
+
+
+            return MethodToExpressionMap[method] = expression;
         }
 
         protected override Expression VisitParameter(ParameterExpression node)

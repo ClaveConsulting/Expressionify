@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 
 namespace Clave.Expressionify
 {
@@ -20,6 +21,14 @@ namespace Clave.Expressionify
             }
 
             return new ExpressionableQueryProvider(source.Provider).CreateQuery<T>(source.Expression);
+        }
+
+        internal static bool MatchesTypeOf(this PropertyInfo property, MethodInfo method)
+        {
+            var methodTypes = method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.ReturnType });
+            var propertyTypes = property.PropertyType.GetGenericArguments()[0].GetGenericArguments();
+
+            return methodTypes.SequenceEqual(propertyTypes);
         }
     }
 }

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Clave.Expressionify.CodeGen
+namespace Clave.Expressionify.Tasks
 {
     public static class Program
     {
@@ -20,53 +21,36 @@ namespace Clave.Expressionify.CodeGen
                 using var stream = File.OpenRead(Path.IsPathRooted(path) ? path : Path.Combine(projectPath, path));
                 var tree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: path);
                 var root = tree.GetRoot();
-                var methods = root
-                    .DescendantNodes()
-                    .OfType<MethodDeclarationSyntax>()
-                    .Where(m => m.AttributeLists
-                        .SelectMany(l => l.Attributes)
-                        .Any(a => a.Name.ToString() == "Expressionify"));
 
-                var properties = new List<PropertyDeclarationSyntax>();
-
-                foreach (var method in methods)
+                try
                 {
-                    if (method.ExpressionBody == null)
+                    var classes = root.TransformClasses();
+                    
+                    if (classes.Any())
                     {
-                        var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
-                        Console.Error.WriteLine($"{path}({line}): error 0: A method with [Expressionify] attribute must have expression body");
-                        return 1;
-                    }
-
-                    if (method.Modifiers.FirstOrDefault(m => m.Kind() == SyntaxKind.StaticKeyword) == null)
-                    {
-                        var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
-                        Console.Error.WriteLine($"{path}({line}): error 0: A method with [Expressionify] attribute must be static. Make it an extension method if you need to use properties of the object");
-                        return 1;
-                    }
-
-                    try
-                    {
-                        properties.Add(method.ToExpressionProperty());
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Error.WriteLine($"Error parsing {path} {method.Identifier}: {e.Message}");
-                        throw;
+                        var newClass = root.WithOnlyTheseClasses(classes.ToArray());
+                        var newPath = Path.Combine(projectPath, "obj", "CodeGen", path);
+                        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                        File.WriteAllText(newPath, newClass);
+                        Console.WriteLine(newPath);
                     }
                 }
-
-                if (properties.Any())
+                catch (CodeGenException e)
                 {
-                    var newClass = root.WithOnlyTheseProperties(properties);
-                    var newPath = Path.Combine(projectPath, "obj", "CodeGen", path);
-                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-                    File.WriteAllText(newPath, newClass);
-                    Console.WriteLine(newPath);
+                    Console.Error.WriteLine(path + e.Message);
+                    return 1;
                 }
             }
 
             return 0;
+        }
+    }
+
+    public class CodeGenException : Exception
+    {
+        public CodeGenException(string message) : base(message)
+        {
+            
         }
     }
 }

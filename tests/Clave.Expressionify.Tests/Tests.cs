@@ -43,6 +43,23 @@ namespace Tests
         }
 
         [Test]
+        public void TestMethodParameterUsedTwiceWithOverload()
+        {
+            var data = new[]{
+                1.0,
+                2.0,
+                3.0
+            };
+
+            data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.Squared())
+                .ToList();
+
+            Assert.Pass();
+        }
+
+        [Test]
         public void TestMethodWithMultipleArguments()
         {
             var data = new[]{

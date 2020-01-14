@@ -20,12 +20,12 @@ namespace Clave.Expressionify.Tests.Second
 
     public static class ExtensionMethods_Expressionify
     {
-        public static Expression<Func<string, bool, int>> ToInt { get; } = (string value, bool extra) => Convert.ToInt32(value);
+        public static Expression<Func<string, bool, int>> ToInt_0 { get; } = (string value, bool extra) => Convert.ToInt32(value);
 
-        public static Expression<Func<string, double>> ToDouble { get; } = (string value) => Convert.ToDouble(value);
+        public static Expression<Func<string, double>> ToDouble_0 { get; } = (string value) => Convert.ToDouble(value);
 
-        public static Expression<Func<string, string, int>> Pluss { get; } = (string a, string b) => a.ToInt(false) + b.ToInt(false);
+        public static Expression<Func<string, string, int>> Pluss_0 { get; } = (string a, string b) => a.ToInt(false) + b.ToInt(false);
 
-        public static Expression<Func<int, int>> Squared { get; } = (int a) => a * a;
+        public static Expression<Func<int, int>> Squared_0 { get; } = (int a) => a * a;
     }
 }
