@@ -79,7 +79,7 @@ public static int ToInt(this string value) => Convert.ToInt32(value);
 public int ToInt(this string value) => Convert.ToInt32(value);
 
 // ❌ Not ok (it's missing the attribute)
-public int ToInt(this string value) => Convert.ToInt32(value);
+public static int ToInt(this string value) => Convert.ToInt32(value);
 
 // ❌ Not ok (it's not public)
 [Expressionify]
