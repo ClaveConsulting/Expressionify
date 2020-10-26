@@ -14,13 +14,14 @@ namespace Clave.Expressionify.Generator
         {
             var syntaxReceiver = (ExpressionifySyntaxReceiver)context.SyntaxReceiver;
 
+            var i = 0;
             foreach (var @class in syntaxReceiver.Classes)
             {
                 var generatedClass = @class.GenerateExpressionClass();
                 if (generatedClass == null) continue;
                 var source = @class.SyntaxTree.GetRoot().WithOnlyTheseClasses(generatedClass);
 
-                context.AddSource($"{@class.Identifier.Text}.Generated.cs", SourceText.From(source, Encoding.UTF8));
+                context.AddSource($"Generated_{i++}.cs", SourceText.From(source, Encoding.UTF8));
             }
         }
 

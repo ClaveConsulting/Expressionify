@@ -43,23 +43,12 @@ namespace Clave.Expressionify
                 return MethodToExpressionMap[method] = false;
             }
 
-            var className = method.DeclaringType.Name;
-            var expressionClassName = GetExpressionifyClassName(className);
-            var expressionClass = method.DeclaringType.Assembly.ExportedTypes
-                .Where(t => t.Namespace == method.DeclaringType.Namespace)
-                .FirstOrDefault(t => t.Name == expressionClassName);
-            if(expressionClass == null)
-            {
-                throw new Exception($"Could not find type {expressionClassName} containing the expressionified method {method.Name}");
-            }
-
-            var properties = expressionClass.GetRuntimeProperties();
+            var properties = method.DeclaringType.GetRuntimeProperties();
             var expression = properties
                 .Where(x => x.Name.StartsWith(method.Name))
                 .Where(x => x.MatchesTypeOf(method))
                 .First()
                 .GetValue(null);
-
 
             return MethodToExpressionMap[method] = expression;
         }

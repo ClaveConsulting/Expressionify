@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <DebugType>embedded</DebugType>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
@@ -10,6 +11,16 @@
         <!-- Generates a package at build -->
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <!-- Do not include the generator as a lib dependency -->
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>Clave.Expressionify.Generator</Title>
+        <PackageIconUrl>https://raw.githubusercontent.com/ClaveConsulting/logo/master/png/logo_noText.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/ClaveConsulting/Expressionify</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/ClaveConsulting/Expressionify</PackageProjectUrl>
+        <Authors>Clave Consulting</Authors>
+        <Description>Use extension methods in Entity Framework Core queries</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
