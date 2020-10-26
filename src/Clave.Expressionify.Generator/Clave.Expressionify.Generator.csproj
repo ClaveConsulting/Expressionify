@@ -4,10 +4,11 @@
         <TargetFramework>net5.0</TargetFramework>
         <DebugType>embedded</DebugType>
         <LangVersion>latest</LangVersion>
+        <VersionPrefix>5.0.0</VersionPrefix>
     </PropertyGroup>
 
     <PropertyGroup>
-        <!--GeneratePackageOnBuild>true</GeneratePackageOnBuild-->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <!-- Generates a package at build -->
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <!-- Do not include the generator as a lib dependency -->
@@ -26,6 +27,7 @@
     <ItemGroup>
         <!-- Package the generator in the analyzer directory of the nuget package -->
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="_._" Pack="true" PackagePath="lib/net5.0" Visible="false" />
     </ItemGroup>
 
     <ItemGroup>
