@@ -6,31 +6,21 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Clave.Expressionify.Tasks
+namespace Clave.Expressionify.Generator
 {
-    public static class Functionality
+    public static class PropertyGenerator
     {
-        public static IReadOnlyList<ClassDeclarationSyntax> TransformClasses(this SyntaxNode root)
-        {
-            return root
-                .DescendantNodes()
-                .OfType<ClassDeclarationSyntax>()
-                .Select(GenerateExpressionClass)
-                .Where(x => x != null)
-                .ToList();
-        }
-
         public static ClassDeclarationSyntax GenerateExpressionClass(this ClassDeclarationSyntax c)
         {
             var props = c.TransformProperties()
                 .GroupBy(p => p.Identifier.Text)
-                .SelectMany(x => x.Select(NewMethod))
+                .SelectMany(x => x.Select(GeneratedName))
                 .ToList();
 
             return props.Any() ? c.WithOnlyTheseProperties(props) : null;
         }
 
-        public static PropertyDeclarationSyntax NewMethod(PropertyDeclarationSyntax p, int i)
+        public static PropertyDeclarationSyntax GeneratedName(PropertyDeclarationSyntax p, int i)
         {
             return p.WithIdentifier(Identifier($"{p.Identifier.Text}_{i}"));
         }
@@ -44,6 +34,11 @@ namespace Clave.Expressionify.Tasks
                     .SelectMany(l => l.Attributes)
                     .Any(a => a.Name.ToString() == "Expressionify"));
 
+            return methods.TransformProperties();
+        }
+
+        public static IReadOnlyList<PropertyDeclarationSyntax> TransformProperties(this IEnumerable<MethodDeclarationSyntax> methods)
+        {
             var properties = new List<PropertyDeclarationSyntax>();
 
             foreach (var method in methods)
@@ -122,5 +117,13 @@ namespace Clave.Expressionify.Tasks
                 GenericName(Identifier("Expression")).WithTypeArgumentList(genericPart));
 
         private static IdentifierNameSyntax System => IdentifierName("System");
+    }
+
+    public class CodeGenException : Exception
+    {
+        public CodeGenException(string message) : base(message)
+        {
+
+        }
     }
 }
