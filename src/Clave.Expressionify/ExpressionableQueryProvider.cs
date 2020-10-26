@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Clave.Expressionify
 {
@@ -59,7 +59,7 @@ namespace Clave.Expressionify
 
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
-            if(_underlyingQueryProvider is IAsyncQueryProvider provider)
+            if (_underlyingQueryProvider is IAsyncQueryProvider provider)
             {
 #pragma warning disable EF1001 // Internal EF Core API usage.
                 return provider.ExecuteAsync<TResult>(Visit(expression), cancellationToken);
