@@ -6,13 +6,20 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Clave.Expressionify.Generator
+namespace Clave.Expressionify.Generator.Internals
 {
     public static class PropertyGenerator
     {
-        public static ClassDeclarationSyntax GenerateExpressionClass(this ClassDeclarationSyntax c)
+        public static ClassDeclarationSyntax? GenerateExpressionClass(this ClassDeclarationSyntax c)
         {
-            var props = c.TransformProperties()
+            var props = c
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .Where(m => m.HasExpressionifyAttribute())
+                .Where(m => m.HasExpressionBody())
+                .Where(m => m.IsStatic())
+                .Where(m => m.IsInPartialClass())
+                .Select(m => m.ToExpressionProperty())
                 .GroupBy(p => p.Identifier.Text)
                 .SelectMany(x => x.Select(GeneratedName))
                 .ToList();
@@ -22,73 +29,31 @@ namespace Clave.Expressionify.Generator
 
         public static PropertyDeclarationSyntax GeneratedName(PropertyDeclarationSyntax p, int i)
         {
-            return p.WithIdentifier(Identifier($"{p.Identifier.Text}_{i}"));
-        }
-
-        public static IReadOnlyList<PropertyDeclarationSyntax> TransformProperties(this SyntaxNode root)
-        {
-            var methods = root
-                .DescendantNodes()
-                .OfType<MethodDeclarationSyntax>()
-                .Where(m => m.AttributeLists
-                    .SelectMany(l => l.Attributes)
-                    .Any(a => a.Name.ToString() == "Expressionify"));
-
-            return methods.TransformProperties();
-        }
-
-        public static IReadOnlyList<PropertyDeclarationSyntax> TransformProperties(this IEnumerable<MethodDeclarationSyntax> methods)
-        {
-            var properties = new List<PropertyDeclarationSyntax>();
-
-            foreach (var method in methods)
-            {
-                if (method.ExpressionBody == null)
-                {
-                    var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
-                    throw new CodeGenException($"({line}): error 0: A method with [Expressionify] attribute must have expression body");
-                }
-
-                if (method.Modifiers.Any(m => m.Kind() == SyntaxKind.StaticKeyword) == false)
-                {
-                    var line = 1 + method.Identifier.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
-                    throw new CodeGenException($"({line}): error 0: A method with [Expressionify] attribute must be static. Make it an extension method if you need to use properties of the object");
-
-                }
-
-                try
-                {
-                    properties.Add(method.ToExpressionProperty());
-                }
-                catch (Exception e)
-                {
-                    throw new CodeGenException($" Error parsing {method.Identifier}: {e.Message}");
-                }
-            }
-
-            return properties;
+            return p.WithIdentifier(Identifier($"{p.Identifier.Text}_Expressionify_{i}"));
         }
 
         public static PropertyDeclarationSyntax ToExpressionProperty(this MethodDeclarationSyntax method)
         {
-            var parameterTypes = method.ParameterList.Parameters.Select(p => p.Type).Concat(new[] { method.ReturnType });
+            var parameterTypes = method.ParameterList.Parameters
+                .Select(p => p.Type)
+                .Concat(new[] { method.ReturnType });
 
             var type = GetExpressionType(parameterTypes);
 
             return PropertyDeclaration(type, method.Identifier.ValueText)
-                .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
+                .WithModifiers(method.Modifiers)
                 .WithAccessorList(GetOnly())
                 .WithInitializer(GetBody(method))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
                 .WithTrailingTrivia(Whitespace("\n"));
         }
 
-        private static EqualsValueClauseSyntax GetBody(MethodDeclarationSyntax method)
+        private static EqualsValueClauseSyntax GetBody(BaseMethodDeclarationSyntax method)
         {
             return EqualsValueClause(
                 ParenthesizedLambdaExpression(
                     ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList())))),
-                    method.ExpressionBody.Expression
+                    method.ExpressionBody!.Expression
                 )
             );
         }
@@ -117,13 +82,5 @@ namespace Clave.Expressionify.Generator
                 GenericName(Identifier("Expression")).WithTypeArgumentList(genericPart));
 
         private static IdentifierNameSyntax System => IdentifierName("System");
-    }
-
-    public class CodeGenException : Exception
-    {
-        public CodeGenException(string message) : base(message)
-        {
-
-        }
     }
 }

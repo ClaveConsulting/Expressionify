@@ -5,11 +5,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Clave.Expressionify.Generator
+namespace Clave.Expressionify.Generator.Internals
 {
     public static class ClassGenerator
     {
-        public static ClassDeclarationSyntax WithOnlyTheseProperties(this ClassDeclarationSyntax c, IEnumerable<PropertyDeclarationSyntax> properties)
+        public static ClassDeclarationSyntax WithOnlyTheseProperties(this ClassDeclarationSyntax c, IEnumerable<MemberDeclarationSyntax> properties)
         {
             // Add the public modifier: (public static partial class Order)
             return ClassDeclaration(c.Identifier.Text)

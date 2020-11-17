@@ -1,4 +1,4 @@
-namespace Clave.Expressionify.Generator.Tests.Samples
+namespace Clave.Expressionify.Tests.Samples
 {
     public static partial class Class3
     {

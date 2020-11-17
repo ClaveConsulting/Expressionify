@@ -1,0 +1,6 @@
+<Project>
+  <Target Name="Wipe" AfterTargets="Clean">
+    <RemoveDir Directories="$(TargetDir)" /> <!-- bin -->
+    <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" /> <!-- obj -->
+  </Target>
+</Project>

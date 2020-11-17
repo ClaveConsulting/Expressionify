@@ -11,17 +11,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4CD5351B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clave.Expressionify.Tests", "tests\Clave.Expressionify.Tests\Clave.Expressionify.Tests.csproj", "{E4AA7774-4C03-4883-B51A-F9171D4F27F0}"
 EndProject
-
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{942AA318-76C0-464F-9ECA-51F55157A1F5}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
+		Directory.build.targets = Directory.build.targets
 		GitVersion.yml = GitVersion.yml
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clave.Expressionify.Generator", "src\Clave.Expressionify.Generator\Clave.Expressionify.Generator.csproj", "{4AC8A74F-99FB-4396-B2FD-71B9BDD788D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clave.Expressionify.Generator.Tests", "tests\Clave.Expressionify.Generator.Tests\Clave.Expressionify.Generator.Tests.csproj", "{1A89B026-78F1-44AE-B0D3-2D6BEC732AFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clave.Expressionify.Generator.Tests", "tests\Clave.Expressionify.Generator.Tests\Clave.Expressionify.Generator.Tests.csproj", "{1A89B026-78F1-44AE-B0D3-2D6BEC732AFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

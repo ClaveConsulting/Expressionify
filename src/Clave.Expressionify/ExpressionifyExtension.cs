@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Clave.Expressionify
@@ -29,6 +30,18 @@ namespace Clave.Expressionify
             var propertyTypes = property.PropertyType.GetGenericArguments()[0].GetGenericArguments();
 
             return methodTypes.SequenceEqual(propertyTypes);
+        }
+
+        internal static T CreateInstance<T>(this Type type, params object?[]? args)
+        {
+            if (Activator.CreateInstance(type, args) is T result)
+            {
+                return result;
+            }
+            else
+            {
+                throw new Exception($"Type {type.FullName} is not of type {typeof(T).FullName}");
+            }
         }
     }
 }
