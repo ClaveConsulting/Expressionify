@@ -15,7 +15,7 @@ steps:
     displayName: 'Use .NET Core sdk 5'
     inputs:
         packageType: sdk
-        version: 5
+        version: 5.x
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: NuGetToolInstaller@1
