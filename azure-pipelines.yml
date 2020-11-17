@@ -19,6 +19,13 @@ steps:
         version: 5.x
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk 3 for gitversion'
+    inputs:
+        packageType: sdk
+        version: 3.1.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
   - task: NuGetToolInstaller@1
     displayName: 'install latest nuget'
     inputs:
