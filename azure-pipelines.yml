@@ -12,10 +12,10 @@ steps:
     clean: true
     persistCredentials: true
   - task: UseDotNet@2
-    displayName: 'Use .NET Core sdk 3.1.100'
+    displayName: 'Use .NET Core sdk 5'
     inputs:
         packageType: sdk
-        version: 3.1.100
+        version: 5
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: NuGetToolInstaller@1
