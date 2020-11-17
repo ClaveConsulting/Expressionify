@@ -1,5 +1,6 @@
 trigger:
   - master
+
 pool:
   name: 'Azure Pipelines'
   vmImage: 'windows-latest'
@@ -72,16 +73,18 @@ steps:
       versioningScheme: byEnvVar
       versionEnvVar: GitVersion.SemVer
 
-  # - task: NuGetCommand@2
-  #   displayName: 'nuget push $(buildConfiguration)'
-  #   inputs:
-  #     command: push
-  #     nuGetFeedType: external
-  #     externalEndpoint: Nuget
+  - task: NuGetCommand@2
+    displayName: 'nuget push $(buildConfiguration)'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    inputs:
+      command: push
+      nuGetFeedType: external
+      externalEndpoint: Nuget
 
-  # - script: |
-  #     git config user.name AzureDevOps
-  #     git config user.email azure@clave.no
-  #     git tag "v$(GitVersion.SemVer)" -m "v$(GitVersion.SemVer)"
-  #     git push origin "v$(GitVersion.SemVer)"
-  #   displayName: 'git push tag'
+  - script: |
+      git config user.name AzureDevOps
+      git config user.email azure@clave.no
+      git tag "v$(GitVersion.SemVer)" -m "v$(GitVersion.SemVer)"
+      git push origin "v$(GitVersion.SemVer)"
+    displayName: 'git push tag'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
