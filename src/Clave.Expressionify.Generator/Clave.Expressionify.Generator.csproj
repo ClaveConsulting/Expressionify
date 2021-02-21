@@ -4,7 +4,6 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <DebugType>embedded</DebugType>
         <LangVersion>9.0</LangVersion>
-        <VersionPrefix>5.0.0</VersionPrefix>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 

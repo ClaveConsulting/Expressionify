@@ -4,7 +4,6 @@
         <TargetFramework>net5.0</TargetFramework>
         <DebugType>embedded</DebugType>
         <LangVersion>latest</LangVersion>
-        <VersionPrefix>5.0.0</VersionPrefix>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
