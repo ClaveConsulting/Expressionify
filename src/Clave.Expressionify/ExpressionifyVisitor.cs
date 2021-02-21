@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,7 +9,7 @@ namespace Clave.Expressionify
 {
     public class ExpressionifyVisitor : ExpressionVisitor
     {
-        private static readonly IDictionary<MethodInfo, LambdaExpression?> MethodToExpressionMap = new Dictionary<MethodInfo, LambdaExpression?>();
+        private static readonly IDictionary<MethodInfo, LambdaExpression?> MethodToExpressionMap = new ConcurrentDictionary<MethodInfo, LambdaExpression?>();
 
         private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
 

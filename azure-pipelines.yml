@@ -83,6 +83,7 @@ steps:
   - task: NuGetCommand@2
     displayName: 'nuget push $(buildConfiguration)'
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    continueOnError: false
     inputs:
       command: push
       nuGetFeedType: external
