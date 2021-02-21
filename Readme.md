@@ -9,11 +9,24 @@
 Install these two nuget packages:
 
 * `Clave.Expressionify`
-* `Clave.Expressionify.Tasks`
+* `Clave.Expressionify.Generator`
+
+Make sure to install the second one properly:
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="Clave.Expressionify" Version="5.0.0" />
+    <PackageReference Include="Clave.Expressionify.Generator" Version="5.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+```
 
 ## How to use
 
-1) Mark the `public static` extension method with the `[Expressionify]` attribute.
+1) Mark the `public static` expression method with the `[Expressionify]` attribute.
+1) Mark the class with the method as `partial`.
 2) Call `.Expressionify()` in your Entity Framework query chain, before using any extension method.
 3) Use the extension method in the query
 
@@ -49,7 +62,7 @@ Unfortunately this forces Entity Framework to run the query in memory, rather th
 But, with just two additional lines of code we can get Entity Framework to understand how translate our extension method to SQL
 
 ```diff
-public static Extensions
+public static partial Extensions
 {
 +   [Expressionify]
     public static bool IsOver18(this User user)
@@ -64,6 +77,12 @@ var users = await db.Users
     .Where(user => user.IsOver18())
     .ToListAsync();
 ```
+
+## Upgrading from 3.1 to 5.0
+
+Version 5 works with net 5.0, and has a few other changes. It relies on [Source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) and Roslyn Analyzers for generating the code, instead of some very clumpsy msbuild code. This means that you will get help if you forget to mark the methods correctly. 
+
+A big change from version 3.1 to 5.0 is that the class no longer needs to be static, but it has to be a partial class.
 
 ## Limitations
 
