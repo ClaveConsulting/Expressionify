@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <DebugType>embedded</DebugType>
+        <LangVersion>9.0</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <!-- Generates a package at build -->
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <!-- Do not include the generator as a lib dependency -->
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>Clave.Expressionify.Generator</Title>
+        <PackageIconUrl>https://raw.githubusercontent.com/ClaveConsulting/logo/master/png/logo_noText.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/ClaveConsulting/Expressionify</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/ClaveConsulting/Expressionify</PackageProjectUrl>
+        <Authors>Clave Consulting</Authors>
+        <Description>Use extension methods in Entity Framework Core queries</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Package the generator in the analyzer directory of the nuget package -->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="_._" Pack="true" PackagePath="lib/netstandard2.0" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.8.0" PrivateAssets="all" />
+    </ItemGroup>
+
+</Project>

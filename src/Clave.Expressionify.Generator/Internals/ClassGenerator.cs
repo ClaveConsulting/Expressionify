@@ -5,21 +5,19 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Clave.Expressionify.Tasks
+namespace Clave.Expressionify.Generator.Internals
 {
     public static class ClassGenerator
     {
-        public static ClassDeclarationSyntax WithOnlyTheseProperties(this ClassDeclarationSyntax oldClass, IEnumerable<PropertyDeclarationSyntax> properties)
+        public static ClassDeclarationSyntax WithOnlyTheseProperties(this ClassDeclarationSyntax c, IEnumerable<MemberDeclarationSyntax> properties)
         {
-            var className = oldClass.Identifier.Text;
-
-            // Add the public modifier: (public class Order)
-            return ClassDeclaration($"{className}_Expressionify")
-                .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
+            // Add the public modifier: (public static partial class Order)
+            return ClassDeclaration(c.Identifier.Text)
+                .WithModifiers(c.Modifiers)
                 .AddMembers(properties.ToArray());
         }
 
-        public static string WithOnlyTheseClasses(this SyntaxNode root, params ClassDeclarationSyntax[] classes)
+        public static string WithOnlyTheseClasses(this SyntaxNode root, ClassDeclarationSyntax @class)
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
@@ -36,8 +34,8 @@ namespace Clave.Expressionify.Tasks
 
             // Add System using statement: (using System)
             @namespace = @namespace.AddUsings(usings);
-            
-            @namespace = @namespace.AddMembers(classes);
+
+            @namespace = @namespace.AddMembers(@class);
 
             return @namespace
                 .NormalizeWhitespace()

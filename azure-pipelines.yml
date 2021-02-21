@@ -1,6 +1,6 @@
 trigger:
   - master
-  
+
 pool:
   name: 'Azure Pipelines'
   vmImage: 'windows-latest'
@@ -13,10 +13,17 @@ steps:
     clean: true
     persistCredentials: true
   - task: UseDotNet@2
-    displayName: 'Use .NET Core sdk 3.1.100'
+    displayName: 'Use .NET Core sdk 5'
     inputs:
         packageType: sdk
-        version: 3.1.100
+        version: 5.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk 3 for gitversion'
+    inputs:
+        packageType: sdk
+        version: 3.1.x
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: NuGetToolInstaller@1
@@ -86,6 +93,6 @@ steps:
       git config user.name AzureDevOps
       git config user.email azure@clave.no
       git tag "v$(GitVersion.SemVer)" -m "v$(GitVersion.SemVer)"
-      git push origin "v$(GitVersion.SemVer)"    
+      git push origin "v$(GitVersion.SemVer)"
     displayName: 'git push tag'
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')

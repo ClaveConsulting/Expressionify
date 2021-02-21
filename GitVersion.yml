@@ -4,7 +4,7 @@ minor-version-bump-message: '\[(feature|minor)\]'
 patch-version-bump-message: '\[(fix|patch)\]'
 no-bump-message: '\[(none|skip)\]'
 
-next-version: 3.1.1
+next-version: 5.0.0
 
 branches:
   master:

@@ -9,11 +9,24 @@
 Install these two nuget packages:
 
 * `Clave.Expressionify`
-* `Clave.Expressionify.Tasks`
+* `Clave.Expressionify.Generator`
+
+Make sure to install the second one properly:
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="Clave.Expressionify" Version="5.0.0" />
+    <PackageReference Include="Clave.Expressionify.Generator" Version="5.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+```
 
 ## How to use
 
-1) Mark the `public static` extension method with the `[Expressionify]` attribute.
+1) Mark the `public static` expression method with the `[Expressionify]` attribute.
+1) Mark the class with the method as `partial`.
 2) Call `.Expressionify()` in your Entity Framework query chain, before using any extension method.
 3) Use the extension method in the query
 
@@ -49,7 +62,7 @@ Unfortunately this forces Entity Framework to run the query in memory, rather th
 But, with just two additional lines of code we can get Entity Framework to understand how translate our extension method to SQL
 
 ```diff
-public static Extensions
+public static partial Extensions
 {
 +   [Expressionify]
     public static bool IsOver18(this User user)
@@ -65,32 +78,50 @@ var users = await db.Users
     .ToListAsync();
 ```
 
+## Upgrading from 3.1 to 5.0
+
+Version 5 works with net 5.0, and has a few other changes. It relies on [Source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) and Roslyn Analyzers for generating the code, instead of some very clumpsy msbuild code. This means that you will get help if you forget to mark the methods correctly. 
+
+These are the breaking changes:
+* The class containing the method no longer needs to be `static`.
+* The class containing the method now has to be marked as `partial`.
+* The method no longer needs to be `public`, it can be private or internal.
+
 ## Limitations
 
-Expressionify uses the Roslyn code analyzer and generator to look for `public` `static` methods with expression bodies tagged with the `[Expressionify]` attribute.
+Expressionify uses the Roslyn code analyzer and generator to look for `static` methods with expression bodies tagged with the `[Expressionify]` attribute in `partial` classes.
 
 ```csharp
-// ✔ OK
-[Expressionify]
-public static int ToInt(this string value) => Convert.ToInt32(value);
+public static partial class Extensions {
+    // ✔ OK
+    [Expressionify]
+    public static int ToInt(this string value) => Convert.ToInt32(value);
 
-// ❌ Not ok (it's not static)
-[Expressionify]
-public int ToInt(this string value) => Convert.ToInt32(value);
+    // ✔ OK (it can be private)
+    [Expressionify]
+    private static int ToInt(this string value) => Convert.ToInt32(value);
+    
+    // ❌ Not ok (it's not static)
+    [Expressionify]
+    public int ToInt(this string value) => Convert.ToInt32(value);
 
-// ❌ Not ok (it's missing the attribute)
-public static int ToInt(this string value) => Convert.ToInt32(value);
-
-// ❌ Not ok (it's not public)
-[Expressionify]
-private static int ToInt(this string value) => Convert.ToInt32(value);
-
-// ❌ Not ok (it doesn't have an expression body)
-[Expressionify]
-public static int ToInt(this string value)
-{
-    return Convert.ToInt32(value);
+    // ❌ Not ok (it's missing the attribute)
+    public static int ToInt(this string value) => Convert.ToInt32(value);
+    
+    // ❌ Not ok (it doesn't have an expression body)
+    [Expressionify]
+    public static int ToInt(this string value)
+    {
+        return Convert.ToInt32(value);
+    }
 }
+
+// ❌ Not ok (it's not a partial class)
+public static class Extensions {
+    [Expressionify]
+    public static int ToInt(this string value) => Convert.ToInt32(value);
+}
+
 ```
 
 

@@ -9,7 +9,7 @@ namespace Clave.Expressionify
 {
     public class ExpressionifyVisitor : ExpressionVisitor
     {
-        private static readonly IDictionary<MethodInfo, object> MethodToExpressionMap = new ConcurrentDictionary<MethodInfo, object>();
+        private static readonly IDictionary<MethodInfo, LambdaExpression?> MethodToExpressionMap = new ConcurrentDictionary<MethodInfo, LambdaExpression?>();
 
         private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
 
@@ -26,7 +26,7 @@ namespace Clave.Expressionify
             return base.VisitMethodCall(node);
         }
 
-        private static object GetMethodExpression(MethodInfo method)
+        private static object? GetMethodExpression(MethodInfo method)
         {
             if (MethodToExpressionMap.TryGetValue(method, out var result))
             {
@@ -35,47 +35,37 @@ namespace Clave.Expressionify
 
             if (!method.IsStatic)
             {
-                return MethodToExpressionMap[method] = false;
+                return MethodToExpressionMap[method] = null;
             }
 
             var shouldUseExpression = method.GetCustomAttributes(typeof(ExpressionifyAttribute), false).Any();
             if (!shouldUseExpression)
             {
-                return MethodToExpressionMap[method] = false;
+                return MethodToExpressionMap[method] = null;
             }
 
-            var className = method.DeclaringType.Name;
-            var expressionClassName = GetExpressionifyClassName(className);
-            var expressionClass = method.DeclaringType.Assembly.ExportedTypes
-                .Where(t => t.Namespace == method.DeclaringType.Namespace)
-                .FirstOrDefault(t => t.Name == expressionClassName);
-            if(expressionClass == null)
-            {
-                throw new Exception($"Could not find type {expressionClassName} containing the expressionified method {method.Name}");
-            }
-
-            var properties = expressionClass.GetRuntimeProperties();
+            var properties = method.DeclaringType?.GetRuntimeProperties();
             var expression = properties
-                .Where(x => x.Name.StartsWith(method.Name))
-                .Where(x => x.MatchesTypeOf(method))
-                .First()
-                .GetValue(null);
+                ?.Where(x => x.Name.StartsWith($"{method.Name}_Expressionify_"))
+                .FirstOrDefault(x => x.MatchesTypeOf(method))
+                ?.GetValue(null);
 
+            if (expression is null)
+            {
+                throw new Exception("Code generation seems to have failed");
+            }
 
-            return MethodToExpressionMap[method] = expression;
+            return MethodToExpressionMap[method] = expression as LambdaExpression;
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (_replacements.TryGetValue(node, out Expression replacement))
-            {
-                return Visit(replacement);
-            }
-
-            return base.VisitParameter(node);
+            return _replacements.TryGetValue(node, out var replacement)
+                ? Visit(replacement) :
+                base.VisitParameter(node);
         }
 
-        private void RegisterReplacementParameters(IReadOnlyList<Expression> parameterValues, LambdaExpression expressionToVisit)
+        private void RegisterReplacementParameters(IReadOnlyCollection<Expression> parameterValues, LambdaExpression expressionToVisit)
         {
             if (parameterValues.Count != expressionToVisit.Parameters.Count)
                 throw new ArgumentException($"The parameter values count ({parameterValues.Count}) does not match the expression parameter count ({expressionToVisit.Parameters.Count})");
@@ -92,11 +82,6 @@ namespace Clave.Expressionify
             {
                 _replacements.Remove(p);
             }
-        }
-
-        public static string GetExpressionifyClassName(string name)
-        {
-            return $"{name}_Expressionify";
         }
     }
 }
