@@ -23,7 +23,7 @@ namespace Clave.Expressionify.Generator.Tests
             var test = @"
                 namespace ConsoleApplication1
                 {
-                    public static partial class Extensions
+                    public partial class Extensions
                     {
                         [Expressionify]
                         public static int Foo(int x) => 8;

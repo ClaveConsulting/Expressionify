@@ -13,7 +13,7 @@ namespace Clave.Expressionify.Generator.Internals
         {
             // Add the public modifier: (public static partial class Order)
             return ClassDeclaration(c.Identifier.Text)
-                .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword), Token(SyntaxKind.PartialKeyword))
+                .WithModifiers(c.Modifiers)
                 .AddMembers(properties.ToArray());
         }
 
