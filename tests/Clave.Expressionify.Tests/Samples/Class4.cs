@@ -6,7 +6,7 @@ namespace Clave.Expressionify.Tests.Samples
     public static partial class Class4
     {
         [Expressionify]
-        public static int Foo(string x) => 8;
+        private static int Foo(string x) => 8;
 
         [Expressionify]
         public static int Something(IEnumerable<string> x) => x.Select(Foo).Sum();

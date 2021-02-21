@@ -41,7 +41,7 @@ namespace Clave.Expressionify.Generator.Internals
             var type = GetExpressionType(parameterTypes);
 
             return PropertyDeclaration(type, method.Identifier.ValueText)
-                .WithModifiers(method.Modifiers)
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)))
                 .WithAccessorList(GetOnly())
                 .WithInitializer(GetBody(method))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))

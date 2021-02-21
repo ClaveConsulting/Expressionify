@@ -82,34 +82,46 @@ var users = await db.Users
 
 Version 5 works with net 5.0, and has a few other changes. It relies on [Source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) and Roslyn Analyzers for generating the code, instead of some very clumpsy msbuild code. This means that you will get help if you forget to mark the methods correctly. 
 
-A big change from version 3.1 to 5.0 is that the class no longer needs to be static, but it has to be a partial class.
+These are the breaking changes:
+* The class containing the method no longer needs to be `static`.
+* The class containing the method now has to be marked as `partial`.
+* The method no longer needs to be `public`, it can be private or internal.
 
 ## Limitations
 
-Expressionify uses the Roslyn code analyzer and generator to look for `public` `static` methods with expression bodies tagged with the `[Expressionify]` attribute.
+Expressionify uses the Roslyn code analyzer and generator to look for `static` methods with expression bodies tagged with the `[Expressionify]` attribute in `partial` classes.
 
 ```csharp
-// ✔ OK
-[Expressionify]
-public static int ToInt(this string value) => Convert.ToInt32(value);
+public static partial class Extensions {
+    // ✔ OK
+    [Expressionify]
+    public static int ToInt(this string value) => Convert.ToInt32(value);
 
-// ❌ Not ok (it's not static)
-[Expressionify]
-public int ToInt(this string value) => Convert.ToInt32(value);
+    // ✔ OK (it can be private)
+    [Expressionify]
+    private static int ToInt(this string value) => Convert.ToInt32(value);
+    
+    // ❌ Not ok (it's not static)
+    [Expressionify]
+    public int ToInt(this string value) => Convert.ToInt32(value);
 
-// ❌ Not ok (it's missing the attribute)
-public static int ToInt(this string value) => Convert.ToInt32(value);
-
-// ❌ Not ok (it's not public)
-[Expressionify]
-private static int ToInt(this string value) => Convert.ToInt32(value);
-
-// ❌ Not ok (it doesn't have an expression body)
-[Expressionify]
-public static int ToInt(this string value)
-{
-    return Convert.ToInt32(value);
+    // ❌ Not ok (it's missing the attribute)
+    public static int ToInt(this string value) => Convert.ToInt32(value);
+    
+    // ❌ Not ok (it doesn't have an expression body)
+    [Expressionify]
+    public static int ToInt(this string value)
+    {
+        return Convert.ToInt32(value);
+    }
 }
+
+// ❌ Not ok (it's not a partial class)
+public static class Extensions {
+    [Expressionify]
+    public static int ToInt(this string value) => Convert.ToInt32(value);
+}
+
 ```
 
 
