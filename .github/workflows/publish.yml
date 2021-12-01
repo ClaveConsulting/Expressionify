@@ -18,6 +18,7 @@ jobs:
           skip-version-file: true
           output-file: false
           skip-on-empty: false
+          git-push: false
 
       - name: Set selected color
         run: echo '::set-output name=SELECTED_COLOR::green'
