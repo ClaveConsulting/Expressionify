@@ -23,8 +23,12 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore --configuration release -p:Version=${{ steps.changelog.outputs.version }}
+        env:
+          VERSION: ${{ steps.changelog.outputs.version }}
+        run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
       - name: Test
         run: dotnet test --no-build --configuration release
       - name: Pack
-        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ steps.changelog.outputs.version }}
+        env:
+          VERSION: ${{ steps.changelog.outputs.version }}
+        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }}
