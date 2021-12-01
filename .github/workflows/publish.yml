@@ -19,6 +19,6 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration release
       - name: Test
-        run: dotnet test --no-build
+        run: dotnet test --no-build --configuration release
       - name: Pack
-        run: dotnet pack --no-build --include-symbols
+        run: dotnet pack --no-build --include-symbols --configuratin release
