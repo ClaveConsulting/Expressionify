@@ -16,6 +16,13 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           skip-version-file: true
+
+      - name: Set selected color
+        run: echo '::set-output name=SELECTED_COLOR::green'
+        id: random-color-generator
+      - name: Get color
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }} and version is ${{ steps.changelog.outputs.version}}"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
