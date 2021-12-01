@@ -16,6 +16,8 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           skip-version-file: true
+          output-file: false
+          skip-on-empty: false
 
       - name: Set selected color
         run: echo '::set-output name=SELECTED_COLOR::green'
