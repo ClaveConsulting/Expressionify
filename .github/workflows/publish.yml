@@ -21,7 +21,7 @@ jobs:
         run: echo '::set-output name=SELECTED_COLOR::green'
         id: random-color-generator
       - name: Get color
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }} and version is ${{ steps.changelog.outputs.version}}"
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }} and version is ${{join(steps.chongelog.outputs.*, '\n')}}"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
