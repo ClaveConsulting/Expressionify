@@ -44,7 +44,7 @@ jobs:
         run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }} --output ./nugets
 
       - name: Push
-        run: dotnet nuget push ./nugets/*.nuget -api-key ${{ secrets.NUGET }}
+        run: dotnet nuget push ./nugets/*.nuget --api-key ${{ secrets.NUGET }}
 
       - name: Tag
         env:
