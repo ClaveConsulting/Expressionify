@@ -10,6 +10,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Conventional Changelog Action
         id: changelog
         uses: TriPSs/conventional-changelog-action@v3
@@ -21,25 +22,23 @@ jobs:
           git-push: false
           skip-commit: true
 
-      - name: Set selected color
-        run: echo '::set-output name=SELECTED_COLOR::green'
-        id: random-color-generator
-      - name: Get color
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }} and version is ${{join(steps.chongelog.outputs.*, '\n')}}"
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
+
       - name: Restore dependencies
         run: dotnet restore
+
       - name: Build
         env:
           VERSION: ${{ steps.changelog.outputs.version }}
         run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
+
       - name: Test
         run: dotnet test --no-build --configuration release
+
       - name: Pack
         env:
           VERSION: ${{ steps.changelog.outputs.version }}
-        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }}
+        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }} --output ./nugets
