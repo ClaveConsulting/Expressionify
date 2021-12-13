@@ -31,20 +31,26 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore --configuration release -p:Version=${{ steps.changelog.outputs.version }}
+        env:
+          VERSION: ${{ steps.changelog.outputs.version }}
+        run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
 
       - name: Test
         run: dotnet test --no-build --configuration release
 
       - name: Pack
-        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ steps.changelog.outputs.version }} --output ./nugets
+        env:
+          VERSION: ${{ steps.changelog.outputs.version }}
+        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }} --output ./nugets
 
       - name: Push
         run: nuget push ./nugets/*.nuget --api-key ${{ secrets.NUGET }}
 
       - name: Tag
+        env:
+          VERSION: ${{ steps.changelog.outputs.version }}
         run: |
           git config user.name GithubAction
           git config user.email github@clave.no
-          git tag "v${{ steps.changelog.outputs.version }}" -m "v${{ steps.changelog.outputs.version }}"
-          git push origin "v${{ steps.changelog.outputs.version }}"
+          git tag "v${{ env.VERSION }}" -m "v${{ env.VERSION }}"
+          git push origin "v${{ env.VERSION }}"
