@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Clave.Expressionify.Tests.First;
 using Clave.Expressionify.Tests.Samples;
 using NUnit.Framework;
@@ -15,7 +16,7 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestBasic()
         {
-            var prop = typeof(Class1).GetProperty("Foo_Expressionify_0");
+            var prop = typeof(Class1).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop.ShouldNotBeNull();
             var expr = prop.GetValue(null) as Expression<Func<int, int>>;
             expr.ShouldNotBeNull();
@@ -31,15 +32,15 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestOverload()
         {
-            typeof(Class3).GetProperties().ShouldNotBeEmpty();
+            typeof(Class3).GetProperties(BindingFlags.NonPublic|BindingFlags.Static).ShouldNotBeEmpty();
 
-            var prop0 = typeof(Class3).GetProperty("Foo_Expressionify_0");
+            var prop0 = typeof(Class3).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop0.ShouldNotBeNull();
             var expr0 = prop0.GetValue(null) as Expression<Func<int, int>>;
             expr0.ShouldNotBeNull();
             expr0.Compile().Invoke(1).ShouldBe(8);
 
-            var prop1 = typeof(Class3).GetProperty("Foo_Expressionify_1");
+            var prop1 = typeof(Class3).GetProperty("Foo_Expressionify_1", BindingFlags.NonPublic | BindingFlags.Static);
             prop1.ShouldNotBeNull();
             var expr1 = prop1.GetValue(null) as Expression<Func<string, int>>;
             expr1.ShouldNotBeNull();
@@ -49,15 +50,15 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestMethodGroup()
         {
-            typeof(Class4).GetProperties().ShouldNotBeEmpty();
+            typeof(Class4).GetProperties(BindingFlags.NonPublic | BindingFlags.Static).ShouldNotBeEmpty();
 
-            var prop0 = typeof(Class4).GetProperty("Foo_Expressionify_0");
+            var prop0 = typeof(Class4).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop0.ShouldNotBeNull();
             var expr0 = prop0.GetValue(null) as Expression<Func<string, int>>;
             expr0.ShouldNotBeNull();
             expr0.Compile().Invoke("1").ShouldBe(8);
 
-            var prop1 = typeof(Class4).GetProperty("Something_Expressionify_0");
+            var prop1 = typeof(Class4).GetProperty("Something_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop1.ShouldNotBeNull();
             var expr1 = prop1.GetValue(null) as Expression<Func<IEnumerable<string>, int>>;
             expr1.ShouldNotBeNull();
