@@ -50,7 +50,4 @@ jobs:
         env:
           VERSION: ${{ steps.changelog.outputs.version }}
         run: |
-          git config user.name GithubAction
-          git config user.email github@clave.no
-          git tag "v${{ env.VERSION }}" -m "v${{ env.VERSION }}"
           git push origin "v${{ env.VERSION }}"
