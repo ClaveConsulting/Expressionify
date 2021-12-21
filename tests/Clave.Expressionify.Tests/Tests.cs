@@ -14,13 +14,23 @@ namespace Clave.Expressionify.Tests
     public class Tests
     {
         [Test]
-        public void TestBasic()
+        public void TestClass()
         {
             var prop = typeof(Class1).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop.ShouldNotBeNull();
             var expr = prop.GetValue(null) as Expression<Func<int, int>>;
             expr.ShouldNotBeNull();
             expr.Compile().Invoke(1).ShouldBe(8);
+        }
+
+        [Test]
+        public void TestRecord()
+        {
+            var prop = typeof(Record1).GetProperty("Create_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
+            prop.ShouldNotBeNull();
+            var expr = prop.GetValue(null) as Expression<Func<string, Record1>>;
+            expr.ShouldNotBeNull();
+            expr.Compile().Invoke("test").ShouldBe(new Record1("test"));
         }
 
         [Test]
@@ -64,8 +74,9 @@ namespace Clave.Expressionify.Tests
             expr1.ShouldNotBeNull();
             expr1.Compile().Invoke(new[] { "test" }).ShouldBe(8);
         }
+
         [Test]
-        public void TestExpressionify()
+        public void TestExpressionifyClass()
         {
             var data = new[]{
                 "1",
@@ -79,6 +90,23 @@ namespace Clave.Expressionify.Tests
                 .ToList();
 
             result.ShouldBe(new[] { 1, 2, 3 });
+        }
+
+        [Test]
+        public void TestExpressionifyRecord()
+        {
+            var data = new[]{
+                "1",
+                "2",
+                "3"
+            };
+
+            var result = data.AsQueryable()
+                .Expressionify()
+                .Select(x => Record1.Create(x))
+                .ToList();
+
+            result.ShouldBe(new Record1[] { new("1"), new("2"), new("3") });
         }
 
         [Test]

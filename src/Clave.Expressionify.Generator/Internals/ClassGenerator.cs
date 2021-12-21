@@ -9,15 +9,15 @@ namespace Clave.Expressionify.Generator.Internals
 {
     public static class ClassGenerator
     {
-        public static ClassDeclarationSyntax WithOnlyTheseProperties(this ClassDeclarationSyntax c, IEnumerable<MemberDeclarationSyntax> properties)
+        public static TypeDeclarationSyntax WithOnlyTheseProperties(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> properties)
         {
             // Add the public modifier: (public static partial class Order)
-            return ClassDeclaration(c.Identifier.Text)
-                .WithModifiers(c.Modifiers)
+            return TypeDeclaration(type.Kind(), type.Identifier)
+                .WithModifiers(type.Modifiers)
                 .AddMembers(properties.ToArray());
         }
 
-        public static string WithOnlyTheseClasses(this SyntaxNode root, ClassDeclarationSyntax @class)
+        public static string WithOnlyTheseTypes(this SyntaxNode root, TypeDeclarationSyntax member)
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
@@ -34,7 +34,7 @@ namespace Clave.Expressionify.Generator.Internals
 
             return NamespaceDeclaration(namespaceName)
                 .AddUsings(usings)
-                .AddMembers(@class)
+                .AddMembers(member)
                 .NormalizeWhitespace()
                 .ToFullString();
         }

@@ -10,22 +10,25 @@ namespace Clave.Expressionify.Generator.Internals
 {
     public static class PropertyGenerator
     {
-        public static ClassDeclarationSyntax? GenerateExpressionClass(this ClassDeclarationSyntax c)
+        public static TypeDeclarationSyntax? GenerateExpressionType(this TypeDeclarationSyntax type)
         {
-            var props = c
+            var props = GetAllExpressionifyMethods(type);
+
+            return props.Any() ? type.WithOnlyTheseProperties(props) : null;
+        }
+
+        private static IReadOnlyList<PropertyDeclarationSyntax> GetAllExpressionifyMethods(TypeDeclarationSyntax node) 
+            => node
                 .DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .Where(m => m.HasExpressionifyAttribute())
                 .Where(m => m.HasExpressionBody())
                 .Where(m => m.IsStatic())
-                .Where(m => m.IsInPartialClass())
+                .Where(m => m.IsinPartialType())
                 .Select(m => m.ToExpressionProperty())
                 .GroupBy(p => p.Identifier.Text)
                 .SelectMany(x => x.Select(GeneratedName))
                 .ToList();
-
-            return props.Any() ? c.WithOnlyTheseProperties(props) : null;
-        }
 
         public static PropertyDeclarationSyntax GeneratedName(PropertyDeclarationSyntax p, int i)
         {

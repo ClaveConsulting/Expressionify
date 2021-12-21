@@ -73,7 +73,7 @@ namespace Clave.Expressionify.Generator
                     methodDeclaration.Identifier.ToString()));
             }
 
-            if (!methodDeclaration.IsInPartialClass())
+            if (!methodDeclaration.IsinPartialType())
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     PartialClassRule,

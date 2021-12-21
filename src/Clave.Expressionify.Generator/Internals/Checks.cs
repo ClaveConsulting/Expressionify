@@ -19,7 +19,7 @@ namespace Clave.Expressionify.Generator.Internals
         public static bool HasExpressionBody(this MethodDeclarationSyntax method) =>
             method.ExpressionBody is not null;
 
-        public static bool IsInPartialClass(this MethodDeclarationSyntax method) =>
-            method.Ancestors().OfType<ClassDeclarationSyntax>().First().Modifiers.Includes(SyntaxKind.PartialKeyword);
+        public static bool IsinPartialType(this MethodDeclarationSyntax method) =>
+            method.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Modifiers.Includes(SyntaxKind.PartialKeyword) ?? false;
     }
 }
