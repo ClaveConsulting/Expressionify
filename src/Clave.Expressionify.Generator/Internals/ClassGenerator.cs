@@ -21,23 +21,20 @@ namespace Clave.Expressionify.Generator.Internals
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
-                .First()
+                .FirstOrDefault()?.Name
+
+                ?? root.DescendantNodes()
+                .OfType<FileScopedNamespaceDeclarationSyntax>()
+                .FirstOrDefault()
                 .Name;
 
             var usings = root.DescendantNodes()
                 .OfType<UsingDirectiveSyntax>()
                 .ToArray();
 
-
-            // Create a namespace: (namespace CodeGenerationSample)
-            var @namespace = NamespaceDeclaration(namespaceName).NormalizeWhitespace();
-
-            // Add System using statement: (using System)
-            @namespace = @namespace.AddUsings(usings);
-
-            @namespace = @namespace.AddMembers(@class);
-
-            return @namespace
+            return NamespaceDeclaration(namespaceName)
+                .AddUsings(usings)
+                .AddMembers(@class)
                 .NormalizeWhitespace()
                 .ToFullString();
         }

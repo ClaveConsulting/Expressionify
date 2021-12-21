@@ -34,6 +34,36 @@ namespace Clave.Expressionify.Generator.Tests
         }
 
         [Test]
+        public void TestWithoutNamespace()
+        {
+
+            var test = @"
+                public partial class Extensions
+                {
+                    [Expressionify]
+                    public static int Foo(int x) => 8;
+                }";
+
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [Test]
+        public void TestWithFileScopedNamespace()
+        {
+
+            var test = @"
+                namespace ConsoleApplication1;
+
+                public partial class Extensions
+                {
+                    [Expressionify]
+                    public static int Foo(int x) => 8;
+                }";
+
+            VerifyCSharpDiagnostic(test);
+        }
+
+        [Test]
         public void TestMissingStatic()
         {
             var test = @"
