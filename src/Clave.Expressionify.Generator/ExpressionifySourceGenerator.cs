@@ -27,7 +27,13 @@ namespace Clave.Expressionify.Generator
         private record Expressioned(
             MethodDeclarationSyntax Original, 
             PropertyDeclarationSyntax Replaced, 
-            (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path);
+            (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
+        {
+            public static Expressioned Create(MethodDeclarationSyntax m) => new(
+                m, 
+                m.ToExpressionProperty(), 
+                m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
+        }
 
         private static void Execute(GeneratorExecutionContext context, IEnumerable<MethodDeclarationSyntax> methods)
         {
@@ -38,7 +44,8 @@ namespace Clave.Expressionify.Generator
                 static MemberDeclarationSyntax[] Group(IEnumerable<Expressioned> methods) =>
                     methods
                         .GroupBy(x => x.Path?.Head, x => x with { Path = x.Path?.Tail.HeadAndTail() })
-                        .Select(g => g.Key.WithOnlyTheseProperties(g
+                        .Select(g => g.Key.WithOnlyTheseMembers(g
+                            .Where(x => x.Path is null)
                             .Select(x => x.Replaced)
                             .GroupBy(p => p.Identifier.Text)
                             .SelectMany(x => x.Select((y, i) => y.GeneratedName(i)))
@@ -46,9 +53,8 @@ namespace Clave.Expressionify.Generator
                         .ToArray();
 
                 var replacedTypes = methods
-                    .Select(m => new Expressioned(m, m.ToExpressionProperty(), m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail()))
-                    .GroupBy(m => m.Original.SyntaxTree.GetRoot())
-                    .Select(x => x.Key.WithOnlyTheseTypes(Group(x)));
+                    .Select(Expressioned.Create)
+                    .GroupBy(m => m.Original.SyntaxTree.GetRoot(), (root, x) => root.WithOnlyTheseTypes(Group(x)));
 
                 foreach (var source in replacedTypes)
                 {

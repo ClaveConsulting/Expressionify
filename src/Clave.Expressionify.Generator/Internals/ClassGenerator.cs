@@ -9,35 +9,12 @@ namespace Clave.Expressionify.Generator.Internals
 {
     public static class ClassGenerator
     {
-        public static TypeDeclarationSyntax WithOnlyTheseProperties(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> properties)
+        public static TypeDeclarationSyntax WithOnlyTheseMembers(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> members)
             => TypeDeclaration(type.Kind(), type.Identifier)
                 .WithModifiers(type.Modifiers)
-                .AddMembers(properties.ToArray());
+                .AddMembers(members.ToArray());
 
-        public static void PathsToTree(this IReadOnlyList<TypeDeclarationSyntax[]> paths)
-        {
-            // A, B, C
-            // A, B
-            // A
-            // D
-            // D, E
-            // D, F
-
-            // groupBy [0], skip 1
-
-            // A: 
-            //  B, C
-            //  B
-            //  -
-            // D:
-            //  -
-            //  E
-            //  F
-
-
-        }
-
-        public static string WithOnlyTheseTypes(this SyntaxNode root, params MemberDeclarationSyntax[] members)
+        public static string WithOnlyTheseTypes(this SyntaxNode root, IEnumerable<MemberDeclarationSyntax> members)
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
@@ -45,8 +22,7 @@ namespace Clave.Expressionify.Generator.Internals
 
                 ?? root.DescendantNodes()
                 .OfType<FileScopedNamespaceDeclarationSyntax>()
-                .FirstOrDefault()
-                .Name;
+                .FirstOrDefault().Name;
 
             var usings = root.DescendantNodes()
                 .OfType<UsingDirectiveSyntax>()
@@ -54,7 +30,7 @@ namespace Clave.Expressionify.Generator.Internals
 
             return NamespaceDeclaration(namespaceName)
                 .AddUsings(usings)
-                .AddMembers(members)
+                .AddMembers(members.ToArray())
                 .NormalizeWhitespace()
                 .ToFullString();
         }

@@ -46,6 +46,7 @@ namespace Clave.Expressionify.Generator
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.RegisterSyntaxNodeAction(
                 Analyze,
                 SyntaxKind.MethodDeclaration);
