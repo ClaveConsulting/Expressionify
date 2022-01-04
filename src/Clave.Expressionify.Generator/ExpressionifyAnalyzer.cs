@@ -46,6 +46,7 @@ namespace Clave.Expressionify.Generator
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.RegisterSyntaxNodeAction(
                 Analyze,
                 SyntaxKind.MethodDeclaration);
@@ -73,7 +74,7 @@ namespace Clave.Expressionify.Generator
                     methodDeclaration.Identifier.ToString()));
             }
 
-            if (!methodDeclaration.IsinPartialType())
+            if (!methodDeclaration.IsInPartialType())
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     PartialClassRule,

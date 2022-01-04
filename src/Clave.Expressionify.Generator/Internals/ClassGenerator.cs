@@ -9,15 +9,12 @@ namespace Clave.Expressionify.Generator.Internals
 {
     public static class ClassGenerator
     {
-        public static TypeDeclarationSyntax WithOnlyTheseProperties(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> properties)
-        {
-            // Add the public modifier: (public static partial class Order)
-            return TypeDeclaration(type.Kind(), type.Identifier)
+        public static TypeDeclarationSyntax WithOnlyTheseMembers(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> members)
+            => TypeDeclaration(type.Kind(), type.Identifier)
                 .WithModifiers(type.Modifiers)
-                .AddMembers(properties.ToArray());
-        }
+                .AddMembers(members.ToArray());
 
-        public static string WithOnlyTheseTypes(this SyntaxNode root, TypeDeclarationSyntax member)
+        public static string WithOnlyTheseTypes(this SyntaxNode root, IEnumerable<MemberDeclarationSyntax> members)
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
@@ -25,8 +22,7 @@ namespace Clave.Expressionify.Generator.Internals
 
                 ?? root.DescendantNodes()
                 .OfType<FileScopedNamespaceDeclarationSyntax>()
-                .FirstOrDefault()
-                .Name;
+                .FirstOrDefault().Name;
 
             var usings = root.DescendantNodes()
                 .OfType<UsingDirectiveSyntax>()
@@ -34,7 +30,7 @@ namespace Clave.Expressionify.Generator.Internals
 
             return NamespaceDeclaration(namespaceName)
                 .AddUsings(usings)
-                .AddMembers(member)
+                .AddMembers(members.ToArray())
                 .NormalizeWhitespace()
                 .ToFullString();
         }

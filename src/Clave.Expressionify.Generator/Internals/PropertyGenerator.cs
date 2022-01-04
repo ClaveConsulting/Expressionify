@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -10,27 +9,7 @@ namespace Clave.Expressionify.Generator.Internals
 {
     public static class PropertyGenerator
     {
-        public static TypeDeclarationSyntax? GenerateExpressionType(this TypeDeclarationSyntax type)
-        {
-            var props = GetAllExpressionifyMethods(type);
-
-            return props.Any() ? type.WithOnlyTheseProperties(props) : null;
-        }
-
-        private static IReadOnlyList<PropertyDeclarationSyntax> GetAllExpressionifyMethods(TypeDeclarationSyntax node) 
-            => node
-                .DescendantNodes()
-                .OfType<MethodDeclarationSyntax>()
-                .Where(m => m.HasExpressionifyAttribute())
-                .Where(m => m.HasExpressionBody())
-                .Where(m => m.IsStatic())
-                .Where(m => m.IsinPartialType())
-                .Select(m => m.ToExpressionProperty())
-                .GroupBy(p => p.Identifier.Text)
-                .SelectMany(x => x.Select(GeneratedName))
-                .ToList();
-
-        public static PropertyDeclarationSyntax GeneratedName(PropertyDeclarationSyntax p, int i)
+        public static PropertyDeclarationSyntax GeneratedName(this PropertyDeclarationSyntax p, int i)
         {
             return p.WithIdentifier(Identifier($"{p.Identifier.Text}_Expressionify_{i}"));
         }
