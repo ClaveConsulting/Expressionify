@@ -52,10 +52,20 @@ namespace Clave.Expressionify
 
             if (expression is null)
             {
-                throw new Exception("Code generation seems to have failed");
+                throw new Exception($"Code generation seems to have failed, could not find expresion for method {GetFullName(method.DeclaringType)}.{method.Name}()");
             }
 
             return MethodToExpressionMap[method] = expression as LambdaExpression;
+        }
+
+        private static string GetFullName(Type type)
+        {
+            if(type.DeclaringType is Type parent)
+            {
+                return GetFullName(parent) + "." + type.Name;
+            }
+
+            return type.Name;
         }
 
         protected override Expression VisitParameter(ParameterExpression node)

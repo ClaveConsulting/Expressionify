@@ -10,14 +10,34 @@ namespace Clave.Expressionify.Generator.Internals
     public static class ClassGenerator
     {
         public static TypeDeclarationSyntax WithOnlyTheseProperties(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> properties)
-        {
-            // Add the public modifier: (public static partial class Order)
-            return TypeDeclaration(type.Kind(), type.Identifier)
+            => TypeDeclaration(type.Kind(), type.Identifier)
                 .WithModifiers(type.Modifiers)
                 .AddMembers(properties.ToArray());
+
+        public static void PathsToTree(this IReadOnlyList<TypeDeclarationSyntax[]> paths)
+        {
+            // A, B, C
+            // A, B
+            // A
+            // D
+            // D, E
+            // D, F
+
+            // groupBy [0], skip 1
+
+            // A: 
+            //  B, C
+            //  B
+            //  -
+            // D:
+            //  -
+            //  E
+            //  F
+
+
         }
 
-        public static string WithOnlyTheseTypes(this SyntaxNode root, TypeDeclarationSyntax member)
+        public static string WithOnlyTheseTypes(this SyntaxNode root, params MemberDeclarationSyntax[] members)
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
@@ -34,7 +54,7 @@ namespace Clave.Expressionify.Generator.Internals
 
             return NamespaceDeclaration(namespaceName)
                 .AddUsings(usings)
-                .AddMembers(member)
+                .AddMembers(members)
                 .NormalizeWhitespace()
                 .ToFullString();
         }

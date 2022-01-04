@@ -10,5 +10,11 @@ namespace Clave.Expressionify.Tests.Samples
 
         [Expressionify]
         public static int Something(IEnumerable<string> x) => x.Select(Foo).Sum();
+
+        public static partial class NestedClass1
+        {
+            [Expressionify]
+            public static string Bar(int x) => $"={8+x}";
+        }
     }
 }

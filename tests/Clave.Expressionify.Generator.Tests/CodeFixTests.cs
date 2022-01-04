@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace Clave.Expressionify.Generator.Tests
 {
-    public class Tests : CodeFixVerifier
+    public class CodeFixTests : CodeFixVerifier
     {
         [Test]
         public void TestNothing()

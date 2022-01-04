@@ -93,6 +93,23 @@ namespace Clave.Expressionify.Tests
         }
 
         [Test]
+        public void TestExpressionifyNestedClass()
+        {
+            var data = new[]{
+                1,
+                2,
+                3
+            };
+
+            var result = data.AsQueryable()
+                .Expressionify()
+                .Select(x => Class4.NestedClass1.Bar(x))
+                .ToList();
+
+            result.ShouldBe(new[] { "=9", "=10", "=11" });
+        }
+
+        [Test]
         public void TestExpressionifyRecord()
         {
             var data = new[]{

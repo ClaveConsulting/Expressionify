@@ -21,16 +21,30 @@ namespace Clave.Expressionify.Generator.Internals
             => node
                 .DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
+                .Where(m => m.FirstAncestorOrSelf<TypeDeclarationSyntax>() == node)
                 .Where(m => m.HasExpressionifyAttribute())
                 .Where(m => m.HasExpressionBody())
                 .Where(m => m.IsStatic())
-                .Where(m => m.IsinPartialType())
+                .Where(m => m.IsInPartialType())
                 .Select(m => m.ToExpressionProperty())
                 .GroupBy(p => p.Identifier.Text)
                 .SelectMany(x => x.Select(GeneratedName))
                 .ToList();
 
-        public static PropertyDeclarationSyntax GeneratedName(PropertyDeclarationSyntax p, int i)
+        public static IReadOnlyList<TypeDeclarationSyntax> GenerateExpressionTypes(this IEnumerable<MethodDeclarationSyntax> methods)
+        {
+            return
+                methods
+                    .Select(m => m.ToExpressionProperty())
+                    .GroupBy(m => m.FirstAncestorOrSelf<TypeDeclarationSyntax>())
+                    .Select(type => type.Key.WithOnlyTheseProperties(type
+                        .GroupBy(m => m.Identifier.Text)
+                        .SelectMany(m => m.Select(GeneratedName))))
+                    .ToList();
+
+        }
+
+        public static PropertyDeclarationSyntax GeneratedName(this PropertyDeclarationSyntax p, int i)
         {
             return p.WithIdentifier(Identifier($"{p.Identifier.Text}_Expressionify_{i}"));
         }
