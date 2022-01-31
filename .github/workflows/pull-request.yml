@@ -1,0 +1,49 @@
+name: Check Pull-request
+
+on: pull_request_target
+
+jobs:
+  check:
+    runs-on: windows-latest
+    outputs:
+      changelog: ${{ env.CHANGE_LOG }}
+
+    steps:
+
+      # Checkout all commits, so we get previous tags
+      # The ref and repository is needed since we use on: pull_request_target
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+      
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      
+      # Look at the tags that have been generated
+      - name: Get the changelog
+        id: changelog
+        run: |
+          echo 'CHANGE_LOG<<EOF' >> $GITHUB_ENV
+          npx -q git-conventional-commits changelog >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+  comment:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      # Create a comment in the pull request using the changelog
+      - uses: marocchino/sticky-pull-request-comment@v1
+        if: needs.check.outputs.changelog != ''
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: ${{ needs.check.outputs.changelog }}
+      - uses: marocchino/sticky-pull-request-comment@v1
+        if: needs.check.outputs.changelog == ''
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            No changelog
