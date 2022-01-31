@@ -14,12 +14,15 @@ namespace Clave.Expressionify.Generator.Internals
             method.Modifiers.Includes(SyntaxKind.StaticKeyword);
 
         public static bool Includes(this SyntaxTokenList modifiers, SyntaxKind modifier) =>
-            modifiers.Any(m => m.Kind() == modifier);
+            modifiers.Any(m => m.IsKind(modifier));
 
         public static bool HasExpressionBody(this MethodDeclarationSyntax method) =>
             method.ExpressionBody is not null;
 
-        public static bool IsInPartialType(this MethodDeclarationSyntax method) =>
-            method.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Modifiers.Includes(SyntaxKind.PartialKeyword) ?? false;
+        public static TypeDeclarationSyntax? FindAncestorMissingPartialKeyword(this MethodDeclarationSyntax method) =>
+            method.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault(t => !t.Modifiers.Includes(SyntaxKind.PartialKeyword));
+
+        public static SyntaxNode? FindNullPropagationNode(this MethodDeclarationSyntax method) =>
+            method.DescendantNodes().OfType<ConditionalAccessExpressionSyntax>().FirstOrDefault();
     }
 }
