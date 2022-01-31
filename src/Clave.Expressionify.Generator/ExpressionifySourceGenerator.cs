@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using Clave.Expressionify.Generator.Internals;
 using Microsoft.CodeAnalysis.CSharp;
+using System.IO;
 
 namespace Clave.Expressionify.Generator
 {
@@ -54,17 +55,17 @@ namespace Clave.Expressionify.Generator
 
                 var replacedTypes = methods
                     .Select(Expressioned.Create)
-                    .GroupBy(m => m.Original.SyntaxTree.GetRoot(), (root, x) => root.WithOnlyTheseTypes(Group(x)));
+                    .GroupBy(m => m.Original.SyntaxTree.GetRoot(), (root, x) => (root.SyntaxTree.FilePath, root.WithOnlyTheseTypes(Group(x))));
 
-                foreach (var source in replacedTypes)
+                foreach (var (path, source) in replacedTypes)
                 {
-                    context.AddSource($"Generated_{i++}.cs", SourceText.From(source, Encoding.UTF8));
+                    context.AddSource(Path.GetFileNameWithoutExtension(path)+$"_expressionify_{i++}.cs", SourceText.From(source.ToFullString(), Encoding.UTF8));
                 }
             }
             catch (Exception e)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor("EXPR001", "Error generating expression", e.Message + "\n" + e.StackTrace, "error",
+                    new DiagnosticDescriptor("EXPR001", "Error generating expression", $"{e.Message}\n{e.StackTrace}", "error",
                         DiagnosticSeverity.Error, true, e.StackTrace), Location.None));
             }
         }

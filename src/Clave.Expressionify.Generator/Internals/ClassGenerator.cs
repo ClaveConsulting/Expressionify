@@ -14,7 +14,7 @@ namespace Clave.Expressionify.Generator.Internals
                 .WithModifiers(type.Modifiers)
                 .AddMembers(members.ToArray());
 
-        public static string WithOnlyTheseTypes(this SyntaxNode root, IEnumerable<MemberDeclarationSyntax> members)
+        public static SyntaxNode WithOnlyTheseTypes(this SyntaxNode root, IEnumerable<MemberDeclarationSyntax> members)
         {
             var namespaceName = root.DescendantNodes()
                 .OfType<NamespaceDeclarationSyntax>()
@@ -31,8 +31,7 @@ namespace Clave.Expressionify.Generator.Internals
             return NamespaceDeclaration(namespaceName)
                 .AddUsings(usings)
                 .AddMembers(members.ToArray())
-                .NormalizeWhitespace()
-                .ToFullString();
+                .NormalizeWhitespace();
         }
     }
 }
