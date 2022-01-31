@@ -27,7 +27,7 @@ jobs:
 
       - name: Conventional Commit Action
         id: conventional-commits
-        run: echo "::set-output name=version::$(npx -q git-conventional-commits version)\n"
+        run: echo "::set-output name=version::$(npx -q git-conventional-commits version)"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
