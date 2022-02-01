@@ -60,12 +60,14 @@ jobs:
           VERSION: ${{ steps.conventional-commits.outputs.version }}
         run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }} --output ./nugets
 
-      #- name: Push
-      #  run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Push
+        run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      #- name: Tag
-      #  env:
-      #    VERSION: ${{ steps.conventional-commits.outputs.version }}
-      #  run: |
-      #    git tag "v${{ env.VERSION }}" 
-      #    git push origin "v${{ env.VERSION }}"
+      - name: Tag
+        env:
+          VERSION: ${{ steps.conventional-commits.outputs.version }}
+        run: |
+          git commit -am "Created release v${{ env.VERSION }}"
+          git tag "v${{ env.VERSION }}" 
+          git push origin "v${{ env.VERSION }}"
+          git push origin
