@@ -17,9 +17,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        env:
-          VERSION: ${{ steps.conventional-commits.outputs.version }}
-        run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
+        run: dotnet build --no-restore --configuration release
 
       - name: Test
         run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
@@ -33,7 +31,7 @@ jobs:
 
   changelog:
     runs-on: ubuntu-latest
-
+    needs: check
     steps:
 
       # Checkout all commits, so we get previous tags
@@ -48,9 +46,6 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Set fallback content
-        run: echo 'No changelog' > temp_changelog.md
       
       # Generate changelog
       - name: Get the changelog
