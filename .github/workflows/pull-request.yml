@@ -24,11 +24,12 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
 
-      - uses: actions/upload-artifact@v2  # upload test results
+      - name: Upload test-results
+        uses: actions/upload-artifact@v2
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results
-          path: test-results.trx
+          path: '**/test-results.trx'
 
   changelog:
     runs-on: ubuntu-latest
