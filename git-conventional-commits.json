@@ -25,7 +25,7 @@
       "?"
     ],
     "commitScopes": [],
-    "commitIgnoreRegexPattern": "^WIP ",
+    "commitIgnoreRegexPattern": "^(WIP|chore)",
     "headlines": {
       "feat": "Features",
       "fix": "Bug Fixes",

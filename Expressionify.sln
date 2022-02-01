@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
 		Readme.md = Readme.md
+		.github\workflows\test-report.yml = .github\workflows\test-report.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clave.Expressionify.Generator", "src\Clave.Expressionify.Generator\Clave.Expressionify.Generator.csproj", "{4AC8A74F-99FB-4396-B2FD-71B9BDD788D6}"

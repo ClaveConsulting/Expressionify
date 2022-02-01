@@ -43,7 +43,13 @@ jobs:
         run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
 
       - name: Test
-        run: dotnet test --no-build --configuration release
+        run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
+
+      - uses: actions/upload-artifact@v2  # upload test results
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: test-results.trx
 
       - name: Changelog
         run: npx -q git-conventional-commits changelog --file CHANGELOG.md

@@ -4,6 +4,33 @@ on: pull_request_target
 
 jobs:
   check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        env:
+          VERSION: ${{ steps.conventional-commits.outputs.version }}
+        run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
+
+      - name: Test
+        run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
+
+      - uses: actions/upload-artifact@v2  # upload test results
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: test-results.trx
+
+  changelog:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,30 +47,15 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Set fallback content
+        run: echo 'No changelog' > temp_changelog.md
       
       # Generate changelog
       - name: Get the changelog
         id: changelog
         run: npx -q git-conventional-commits changelog --file 'temp_changelog.md'
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: changelog
-          path: temp_changelog.md
-          
-  comment:
-    runs-on: ubuntu-latest
-    needs: check
-    steps:
-      - name: Set fallback content
-        run: echo 'No changelog' > temp_changelog.md
-
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: changelog
-
+        
       # Create a comment in the pull request using the changelog
       - uses: marocchino/sticky-pull-request-comment@v1
         with:
