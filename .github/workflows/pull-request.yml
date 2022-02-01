@@ -4,7 +4,7 @@ on: pull_request_target
 
 jobs:
   check:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     outputs:
       changelog: ${{ env.CHANGE_LOG }}
 
@@ -23,7 +23,7 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       
-      # Look at the tags that have been generated
+      # Generate changelog
       - name: Get the changelog
         id: changelog
         run: |
@@ -31,6 +31,13 @@ jobs:
           npx -q git-conventional-commits changelog >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
+      - name: Debug
+        run: | 
+          echo 'changelog variable'
+          echo ${{ env.CHANGE_LOG }}
+          echo 'changelog'
+          npx -q git-conventional-commits changelog
+          
   comment:
     runs-on: ubuntu-latest
     needs: check
