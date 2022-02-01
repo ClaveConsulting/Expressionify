@@ -5,8 +5,6 @@ on: pull_request_target
 jobs:
   check:
     runs-on: ubuntu-latest
-    outputs:
-      changelog: ${{ env.CHANGE_LOG }}
 
     steps:
 
@@ -38,6 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check
     steps:
+      - name: Set fallback content
+        run: echo 'No changelog' > temp_changelog.md
+
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
@@ -45,13 +46,6 @@ jobs:
 
       # Create a comment in the pull request using the changelog
       - uses: marocchino/sticky-pull-request-comment@v1
-        if: needs.check.outputs.changelog != ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           path: temp_changelog.md
-      - uses: marocchino/sticky-pull-request-comment@v1
-        if: needs.check.outputs.changelog == ''
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          message: |
-            No changelog
