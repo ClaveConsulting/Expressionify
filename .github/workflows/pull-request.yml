@@ -26,28 +26,29 @@ jobs:
       # Generate changelog
       - name: Get the changelog
         id: changelog
-        run: |
-          echo 'CHANGE_LOG<<EOF' >> $GITHUB_ENV
-          npx -q git-conventional-commits changelog >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+        run: npx -q git-conventional-commits changelog --file 'temp/changelog.md'
 
-      - name: Debug
-        run: | 
-          echo 'changelog variable'
-          echo ${{ env.CHANGE_LOG }}
-          echo 'changelog'
-          npx -q git-conventional-commits changelog
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: changelog
+          path: temp/changelog.md
           
   comment:
     runs-on: ubuntu-latest
     needs: check
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: changelog
+
       # Create a comment in the pull request using the changelog
       - uses: marocchino/sticky-pull-request-comment@v1
         if: needs.check.outputs.changelog != ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          message: ${{ needs.check.outputs.changelog }}
+          path: temp/changelog.md
       - uses: marocchino/sticky-pull-request-comment@v1
         if: needs.check.outputs.changelog == ''
         with:
