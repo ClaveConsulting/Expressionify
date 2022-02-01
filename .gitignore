@@ -3,3 +3,4 @@ obj/
 /output
 /.vs
 *.user
+/temp-changelog.md
