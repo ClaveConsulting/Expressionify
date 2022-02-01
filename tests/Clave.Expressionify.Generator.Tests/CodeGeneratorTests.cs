@@ -34,7 +34,7 @@ namespace Clave.Expressionify.Generator.Tests
     {
         private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
     }
-}", Description = "Normal scenario")]
+}", TestName = "Normal scenario")]
         [TestCase(@"namespace ConsoleApplication1;
     public partial class Extensions
     {
@@ -47,7 +47,7 @@ namespace Clave.Expressionify.Generator.Tests
     {
         private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
     }
-}", Description = "Nested class")]
+}", TestName = "Nested class")]
         [TestCase(@"namespace ConsoleApplication1
 {
     public partial class Extensions
@@ -72,7 +72,7 @@ namespace Clave.Expressionify.Generator.Tests
             private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
         }
     }
-}", Description = "File scoped namespace")]
+}", TestName = "File scoped namespace")]
         public async Task TestGenerator(string source, string generated)
         {
             await VerifyGenerated(source, generated);
