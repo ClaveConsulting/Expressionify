@@ -15,8 +15,8 @@ Make sure to install the second one properly:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="Clave.Expressionify" Version="5.0.0" />
-    <PackageReference Include="Clave.Expressionify.Generator" Version="5.0.0">
+    <PackageReference Include="Clave.Expressionify" Version="6.4.0" />
+    <PackageReference Include="Clave.Expressionify.Generator" Version="6.4.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -29,6 +29,8 @@ Make sure to install the second one properly:
 1) Mark the class with the method as `partial`.
 2) Call `.Expressionify()` in your Entity Framework query chain, before using any extension method.
 3) Use the extension method in the query
+
+Alternatively, if you don't want to call `.Expressionify()` on each query, you can also configure your `DbContext` with `.UseExpressionify()`.
 
 ## Example
 
@@ -76,6 +78,21 @@ var users = await db.Users
 +   .Expressionify()
     .Where(user => user.IsOver18())
     .ToListAsync();
+```
+
+## Example configuration
+
+If you configure Expressionify directly on your DbContext, you don't need to call `.Expressionify()` your queries.
+
+```csharp
+public class AppDbContext : DbContext
+{
+    public AppDbContext() : base(new DbContextOptionsBuilder<AppDbContext>()
+                                    .UseSqlServer("ConnectionString")
+                                    .UseExpressionify() // Note that this must be called after configuring your DB provider
+                                    .Options)
+    { }
+}
 ```
 
 ## Upgrading from 3.1 to 5.0
