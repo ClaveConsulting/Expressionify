@@ -25,12 +25,11 @@ Make sure to install the second one properly:
 
 ## How to use
 
+0) Setup your database context with `.UseExpressionify()`
 1) Mark the `public static` expression method with the `[Expressionify]` attribute.
-1) Mark the class with the method as `partial`.
-2) Call `.Expressionify()` in your Entity Framework query chain, before using any extension method.
+2) Mark the class with the method as `partial`.
 3) Use the extension method in the query
 
-Alternatively, if you don't want to call `.Expressionify()` on each query, you can also configure your `DbContext` with `.UseExpressionify()`.
 
 ## Example
 
@@ -45,7 +44,7 @@ var users = await db.Users
 That second line is a bit long, so it would be nice to pull it out as a reusable extension method:
 
 ```csharp
-public static Extensions
+public static class Extensions
 {
     public static bool IsOver18(this User user)
         => user.DateOfBirth < DateTime.Now.AddYears(-18);
@@ -61,39 +60,41 @@ var users = await db.Users
 
 Unfortunately this forces Entity Framework to run the query in memory, rather than in the database. That's not very efficient...
 
-But, with just two additional lines of code we can get Entity Framework to understand how translate our extension method to SQL
+But, with just one additional line of code we can get Entity Framework to understand how translate our extension method to SQL
 
 ```diff
-public static partial Extensions
-{
-+   [Expressionify]
-    public static bool IsOver18(this User user)
-        => user.DateOfBirth < DateTime.Now.AddYears(-18);
-}
+- public static class Extensions
++ public static partial class Extensions
+  {
++     [Expressionify]
+      public static bool IsOver18(this User user)
+          => user.DateOfBirth < DateTime.Now.AddYears(-18);
+  }
 
-// ...
+```
 
-// create a query
+## Setup
+
+The simplest way to add expressionify support is to configure the database context:
+
+```csharp
+services
+    .AddDbContext<MyDbContext>(o => o
+        .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+        .UseExpressionify());
+```
+
+Make sure to call `.UseExpressionify()` after `.UseSqlServer()` (or whatever other sql provider you want to use).
+
+The alternative is to only call `.Expressionify()` in the queries where you want it:
+
+```csharp
 var users = await db.Users
-+   .Expressionify()
-    .Where(user => user.IsOver18())
+    .Expressionify()
+    .Where(user => user.DateOfBirth < DateTime.Now.AddYears(-18))
     .ToListAsync();
 ```
 
-## Example configuration
-
-If you configure Expressionify directly on your DbContext, you don't need to call `.Expressionify()` your queries.
-
-```csharp
-public class AppDbContext : DbContext
-{
-    public AppDbContext() : base(new DbContextOptionsBuilder<AppDbContext>()
-                                    .UseSqlServer("ConnectionString")
-                                    .UseExpressionify() // Note that this must be called after configuring your DB provider
-                                    .Options)
-    { }
-}
-```
 
 ## Upgrading from 3.1 to 5.0
 
