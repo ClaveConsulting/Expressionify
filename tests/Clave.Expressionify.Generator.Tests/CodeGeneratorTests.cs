@@ -88,9 +88,9 @@ namespace Clave.Expressionify.Generator.Tests
                     Sources = { source, AttributeCode },
                     GeneratedSources =
                     {
-                        (typeof(ExpressionifySourceGenerator), "Test0_expressionify_0.cs", SourceText.From(generated.Replace("\r\n", Environment.NewLine), Encoding.UTF8, SourceHashAlgorithm.Sha1)),
-                    },
-                },
+                        (typeof(ExpressionifySourceGenerator), "Test0_expressionify_0.cs", SourceText.From(generated.Replace(Environment.NewLine, "\r\n"), Encoding.UTF8, SourceHashAlgorithm.Sha1)),
+                    }
+                }
             }.RunAsync();
         }
     }
