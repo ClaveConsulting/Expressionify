@@ -1,3 +1,9 @@
+## **6.5.0** <sub><sup>2022-04-29 ([b8b62c1...b8b62c1](https://github.com/ClaveConsulting/Expressionify/compare/b8b62c1...b8b62c1?diff=split))</sup></sub>
+
+### Features
+*  Use QueryCompiler to support Include\(\) ([b8b62c1](https://github.com/ClaveConsulting/Expressionify/commit/b8b62c1))
+
+
 ## **6.4.1** <sub><sup>2022-04-29 ([993a4c7...7e03b8c](https://github.com/ClaveConsulting/Expressionify/compare/993a4c7...7e03b8c?diff=split))</sup></sub>
 
 ### Bug Fixes
