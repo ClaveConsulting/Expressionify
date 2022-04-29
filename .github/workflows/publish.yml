@@ -45,12 +45,14 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
 
-      - name: Upload test-results
-        uses: actions/upload-artifact@v2
+      - name: Report test results
+        uses: dorny/test-reporter@v1
         if: success() || failure()        # run this step even if previous step failed
         with:
-          name: test-results
+          name: Tests
           path: '**/test-results.trx'
+          reporter: dotnet-trx
+          fail-on-error: 'false'
 
       - name: Changelog
         run: npx -q git-conventional-commits changelog --file CHANGELOG.md
