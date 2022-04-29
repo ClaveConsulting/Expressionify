@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -12,7 +12,7 @@ namespace Clave.Expressionify
     {
         public void ApplyServices(IServiceCollection services)
         {
-            AddDecorator<IAsyncQueryProvider, ExpressionableQueryProvider>(services);
+            AddDecorator<IQueryCompiler, ExpressionableQueryCompiler>(services);
         }
 
         private static void AddDecorator<TService, TDecorator>(IServiceCollection services)
