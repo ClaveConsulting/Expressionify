@@ -14,7 +14,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Select(e => e.GetName("oh hi"));
 
             var sql = query.ToQueryString();
-            sql.ShouldStartWith("SELECT ('oh hi' || ' ') || \"t\".\"Name\"");
+            sql.ShouldStartWith("SELECT 'oh hi ' || \"t\".\"Name\"");
         }
 
         [Test]
@@ -47,6 +47,34 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
 
             var sql = query.ToQueryString();
             sql.ShouldStartWith("SELECT \"t\".\"Id\", \"t\".\"Name\"");
+        }
+
+        [Test]
+        public void Expressionify_ShouldHandleWhereWithParameters()
+        {
+            using var dbContext = new TestDbContext(GetOptions(useExpressionify: true));
+            var query = dbContext.TestEntities.Expressionify().Where(e => e.IsSomething());
+
+            query.ToQueryString().ShouldBe(".param set @__Name_0 'Something'\r\n\r\nSELECT \"t\".\"Id\", \"t\".\"Name\"\r\nFROM \"TestEntities\" AS \"t\"\r\nWHERE \"t\".\"Name\" = @__Name_0");
+        }
+
+        [Test]
+        public void UseExpressionify_ShouldHandleWhereWithParameters()
+        {
+            using var dbContext = new TestDbContext(GetOptions(useExpressionify: true));
+            var query = dbContext.TestEntities.Where(e => e.IsSomething());
+
+            query.ToQueryString().ShouldBe(".param set @__Name_0 'Something'\r\n\r\nSELECT \"t\".\"Id\", \"t\".\"Name\"\r\nFROM \"TestEntities\" AS \"t\"\r\nWHERE \"t\".\"Name\" = @__Name_0");
+        }
+
+        [Test]
+        public void UseExpressionify_ShouldProduceSameOutputAsExpressionify()
+        {
+            using var dbContext = new TestDbContext(GetOptions(useExpressionify: true));
+            var queryA = dbContext.TestEntities.Where(e => e.IsSomething());
+            var queryB = dbContext.TestEntities.Expressionify().Where(e => e.IsSomething());
+
+            queryA.ToQueryString().ShouldBe(queryB.ToQueryString());
         }
 
         private DbContextOptions GetOptions(bool useExpressionify)

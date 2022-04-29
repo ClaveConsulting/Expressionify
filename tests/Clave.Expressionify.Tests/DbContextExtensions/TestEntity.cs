@@ -1,4 +1,6 @@
-﻿namespace Clave.Expressionify.Tests.DbContextExtensions
+﻿using System;
+
+namespace Clave.Expressionify.Tests.DbContextExtensions
 {
     public class TestEntity
     {

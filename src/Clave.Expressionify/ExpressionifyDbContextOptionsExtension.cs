@@ -12,10 +12,11 @@ namespace Clave.Expressionify
     {
         public void ApplyServices(IServiceCollection services)
         {
-            AddDecorator<IQueryTranslationPreprocessorFactory, ExpressionifyQueryTranslationPreprocessorFactory>(services);
+            AddDecorator<IAsyncQueryProvider, ExpressionableQueryProvider>(services);
         }
 
         private static void AddDecorator<TService, TDecorator>(IServiceCollection services)
+            where TDecorator : TService
         {
             var descriptor = services.FirstOrDefault(s => s.ServiceType == typeof(TService));
             if (descriptor == null || descriptor.ImplementationType == null && descriptor.ImplementationFactory == null && descriptor.ImplementationInstance == null)
@@ -23,19 +24,15 @@ namespace Clave.Expressionify
 
             // Replace service with decorator. Factory creates the decorator with an instance of the decorated type, based on the original registration.
             services.Replace(ServiceDescriptor.Describe(
-                descriptor.ServiceType, 
+                descriptor.ServiceType,
                 provider => ActivatorUtilities.CreateInstance(provider, typeof(TDecorator), GetInstance(provider, descriptor)),
                 descriptor.Lifetime));
 
             static object GetInstance(IServiceProvider provider, ServiceDescriptor descriptor)
             {
-                if (descriptor.ImplementationInstance != null)
-                    return descriptor.ImplementationInstance;
-
-                if (descriptor.ImplementationFactory != null)
-                    return descriptor.ImplementationFactory(provider);
-
-                return ActivatorUtilities.GetServiceOrCreateInstance(provider, descriptor.ImplementationType!);
+                return descriptor.ImplementationInstance
+                    ?? descriptor.ImplementationFactory?.Invoke(provider)
+                    ?? ActivatorUtilities.GetServiceOrCreateInstance(provider, descriptor.ImplementationType!);
             }
         }
 
