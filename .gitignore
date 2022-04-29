@@ -1,6 +1,8 @@
 bin/
 obj/
 /output
+/nugets
+TestResults/
 /.vs
 *.user
 /temp-changelog.md
