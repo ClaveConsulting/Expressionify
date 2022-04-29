@@ -15,8 +15,8 @@ Make sure to install the second one properly:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="Clave.Expressionify" Version="6.4.0" />
-    <PackageReference Include="Clave.Expressionify.Generator" Version="6.4.0">
+    <PackageReference Include="Clave.Expressionify" Version="6.4.1" />
+    <PackageReference Include="Clave.Expressionify.Generator" Version="6.4.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

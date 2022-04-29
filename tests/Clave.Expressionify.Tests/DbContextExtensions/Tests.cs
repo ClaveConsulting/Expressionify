@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Shouldly;
@@ -55,7 +56,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             using var dbContext = new TestDbContext(GetOptions(useExpressionify: true));
             var query = dbContext.TestEntities.Expressionify().Where(e => e.IsSomething());
 
-            query.ToQueryString().ShouldBe(".param set @__Name_0 'Something'\r\n\r\nSELECT \"t\".\"Id\", \"t\".\"Name\"\r\nFROM \"TestEntities\" AS \"t\"\r\nWHERE \"t\".\"Name\" = @__Name_0");
+            query.ToQueryString().ShouldBe($".param set @__Name_0 'Something'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @__Name_0");
         }
 
         [Test]
@@ -64,7 +65,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             using var dbContext = new TestDbContext(GetOptions(useExpressionify: true));
             var query = dbContext.TestEntities.Where(e => e.IsSomething());
 
-            query.ToQueryString().ShouldBe(".param set @__Name_0 'Something'\r\n\r\nSELECT \"t\".\"Id\", \"t\".\"Name\"\r\nFROM \"TestEntities\" AS \"t\"\r\nWHERE \"t\".\"Name\" = @__Name_0");
+            query.ToQueryString().ShouldBe($".param set @__Name_0 'Something'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @__Name_0");
         }
 
         [Test]
