@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -13,6 +13,8 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <!-- Do not include the generator as a lib dependency -->
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <!-- Mark as development dependency and include PrivateAssets/IncludeAssets when installing package -->
+        <DevelopmentDependency>true</DevelopmentDependency>
     </PropertyGroup>
 
     <PropertyGroup>
