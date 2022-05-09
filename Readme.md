@@ -15,8 +15,8 @@ Make sure to install the second one properly:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="Clave.Expressionify" Version="6.5.0" />
-    <PackageReference Include="Clave.Expressionify.Generator" Version="6.5.0">
+    <PackageReference Include="Clave.Expressionify" Version="6.6.0" />
+    <PackageReference Include="Clave.Expressionify.Generator" Version="6.6.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -95,6 +95,15 @@ var users = await db.Users
     .ToListAsync();
 ```
 
+### Query caching
+
+When configuring the DbContext with `.UseExpressionify()`, Expressionify is called on each query execution.
+
+You can use the EntityFramework compiled query cache, which calls Expressionify only while EntityFramework caches the query, but it comes with [some limitations](#query-caching-limitations).
+
+```csharp
+.UseExpressionify(o => o.WithEvaluationMode(ExpressionEvaluationMode.Cached));
+```
 
 ## Upgrading from 3.1 to 5.0
 
@@ -142,6 +151,49 @@ public static class Extensions {
 
 ```
 
+### Query caching limitations
+
+Using [query caching](#query-caching) works fine unless you introduce new query parameters in your `[Expressionify]` method. In that case you'll get an `InvalidOperationException` telling you to explicitly call `.Expressionify()` on the query, as the query cannot be translated.
+
+Examples:
+```csharp
+public static partial class Extensions {
+   // Example: users.Where(u => u.IsOver18())
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ✔ OK for ExpressionEvaluationMode.Cached
+   // The expression can be translated to SQL without introducing new parameters
+   [Expressionify]
+   public static bool IsOver18(this User user)
+       => user.DateOfBirth < DateTime.Now.AddYears(-18);
+
+   // Example: users.Where(u => u.IsOlderThan(18))
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ✔ OK for ExpressionEvaluationMode.Cached
+   // The parameter 'years' is already present in the query itself. No new parameters are introduced when expanding the query.
+   [Expressionify]
+   public static bool IsOlderThan(this User user, int years)
+       => user.DateOfBirth < DateTime.Now.AddYears(-years);
+
+   // Example: users.Where(u => u.WasAddedRecently())
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ❌ Not ok for ExpressionEvaluationMode.Cached
+   // ✔ OK for ExpressionEvaluationMode.Cached when explicitly expanding the query with 'query.Expressionify()'
+   // 'TimeProvider.UtcNow' is a new parameter that is not known in the query before calling '.Expressionify()'.
+   [Expressionify]
+   public static bool WasAddedRecently(this User user)
+       => user.Created >= TimeProvider.UtcNow.AddDays(-1);
+
+   // Example: users.Select(u => u.ToTestView(null))
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ❌ Not ok for ExpressionEvaluationMode.Cached
+   // ✔ OK for ExpressionEvaluationMode.Cached when explicitly expanding the query with 'query.Expressionify()'
+   // With the input 'null' on the address, the expression 'address == null ? null : address.Street' gets replaced with a
+   // new parameter for the value 'null'.
+   [Expressionify]
+   public static TestView ToTestView(this TestEntity testEntity, TestAddress? address)
+       => new() { Name = testEntity.Name, Street = address == null ? null : address.Street };
+}
+```
 
 ## Inspiration and help
 
