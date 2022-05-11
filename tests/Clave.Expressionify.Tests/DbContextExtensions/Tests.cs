@@ -132,6 +132,19 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             queryA.ToQueryString().ShouldBe(queryB.ToQueryString());
         }
 
+        [TestCase(ExpressionEvaluationMode.Always)]
+        [TestCase(ExpressionEvaluationMode.Cached)]
+        public void UseExpressionify_ShouldProduceSameOutputAsExpressionify_InAllModes(ExpressionEvaluationMode mode)
+        {
+            // Note: when not using the result of ParameterExtractingExpressionVisitor, the Cached mode returns another query with an additional concat (which would be unintended)
+
+            using var dbContext = new TestDbContext(GetOptions(o => o.WithEvaluationMode(mode)));
+            var queryA = dbContext.TestEntities.Select(e => e.GetName("oh hi"));
+            var queryB = dbContext.TestEntities.Expressionify().Select(e => e.GetName("oh hi"));
+
+            queryA.ToQueryString().ShouldBe(queryB.ToQueryString());
+        }
+
         [Test]
         public void UseExpressionify_EvaluationModeAlways_ShouldHandleEvaluatableExpressions()
         {
