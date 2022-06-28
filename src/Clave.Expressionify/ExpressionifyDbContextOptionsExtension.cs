@@ -20,7 +20,7 @@ namespace Clave.Expressionify
         }
         
         public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
-        public ExpressionEvaluationMode EvaluationMode { get; private set; } = ExpressionEvaluationMode.Always;
+        public ExpressionEvaluationMode EvaluationMode { get; private set; } = ExpressionEvaluationMode.Cached;
 
         public void ApplyServices(IServiceCollection services)
         {
