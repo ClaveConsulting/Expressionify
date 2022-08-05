@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -11,25 +10,9 @@ namespace Clave.Expressionify
 {
     public class ExpressionifyDbContextOptionsExtension : IDbContextOptionsExtension
     {
-        public ExpressionifyDbContextOptionsExtension()
-        { }
-
-        public ExpressionifyDbContextOptionsExtension(ExpressionifyDbContextOptionsExtension copyFrom)
-        {
-            EvaluationMode = copyFrom.EvaluationMode;
-        }
-        
-        public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
-        public ExpressionEvaluationMode EvaluationMode { get; private set; } = ExpressionEvaluationMode.Always;
-
         public void ApplyServices(IServiceCollection services)
         {
-            if (EvaluationMode == ExpressionEvaluationMode.Always)
-                AddDecorator<IQueryCompiler, ExpressionableQueryCompiler>(services);
-            else if (EvaluationMode == ExpressionEvaluationMode.Cached)
-                AddDecorator<IQueryTranslationPreprocessorFactory, ExpressionifyQueryTranslationPreprocessorFactory>(services);
-            else
-                throw new NotSupportedException($"Unsupported {nameof(EvaluationMode)}");
+            AddDecorator<IQueryCompiler, ExpressionableQueryCompiler>(services);
         }
 
         private static void AddDecorator<TService, TDecorator>(IServiceCollection services)
@@ -58,43 +41,33 @@ namespace Clave.Expressionify
             // No options to validate
         }
 
-        public ExpressionifyDbContextOptionsExtension WithEvaluationMode(ExpressionEvaluationMode evaluationMode)
-        {
-            var clone = Clone();
-            clone.EvaluationMode = evaluationMode;
-            return clone;
-        }
-
-        private ExpressionifyDbContextOptionsExtension Clone() => new(this);
+        public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
 
         private class ExtensionInfo : DbContextOptionsExtensionInfo
         {
-            private readonly ExpressionifyDbContextOptionsExtension _extension;
-
-            public ExtensionInfo(ExpressionifyDbContextOptionsExtension extension) : base(extension)
-            {
-                _extension = extension;
-            }
+            public ExtensionInfo(IDbContextOptionsExtension extension) : base(extension)
+            { }
 
             public override bool IsDatabaseProvider => false;
             public override string LogFragment => string.Empty;
 
             public override int GetServiceProviderHashCode()
             {
-                // Hash all options here
-                return _extension.EvaluationMode.GetHashCode();
+                // As long as there are no options, we can just return 0.
+                // Once options get added, hash them.
+                return 0;
             }
 
             public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
             {
-                // Check if all options are the same
-                return other is ExtensionInfo otherInfo 
-                    && otherInfo._extension.EvaluationMode == _extension.EvaluationMode;
+                // As long as there are no options, we can just return true.
+                // Once options get added, check if they're the same.
+                return true;
             }
 
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
-                debugInfo["Expressionify:EvaluationMode"] = _extension.EvaluationMode.ToString();
+                debugInfo["Expressionify:Enabled"] = "true";
                 // Add values of options here
             }
         }

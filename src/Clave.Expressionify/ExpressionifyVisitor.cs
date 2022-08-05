@@ -13,13 +13,10 @@ namespace Clave.Expressionify
 
         private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
 
-        internal bool HasReplacedCalls { get; private set; }
-
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (GetMethodExpression(node.Method) is LambdaExpression expression)
             {
-                HasReplacedCalls = true;
                 RegisterReplacementParameters(node.Arguments, expression);
                 var result = Visit(expression.Body);
                 UnregisterReplacementParameters(expression);
