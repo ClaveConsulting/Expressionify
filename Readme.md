@@ -97,12 +97,12 @@ var users = await db.Users
 
 ### Query caching
 
-When configuring the DbContext with `.UseExpressionify()`, Expressionify tries to use the EntityFramework query cache by default. This way the expression tree is only processed once and then cached. 
-However, this comes with [some limitations](#query-caching-limitations). Expressionify throws an exception if your query cannot be cached. 
-To fix this, you either have to call `.Expressionify()` explicitly on the query or disable query caching:
+When configuring the DbContext with `.UseExpressionify()`, Expressionify is called on each query execution.
+
+You can use the EntityFramework compiled query cache, which calls Expressionify only while EntityFramework caches the query, but it comes with [some limitations](#query-caching-limitations).
 
 ```csharp
-.UseExpressionify(o => o.WithEvaluationMode(ExpressionEvaluationMode.Always));
+.UseExpressionify(o => o.WithEvaluationMode(ExpressionEvaluationMode.Cached));
 ```
 
 ## Upgrading from 3.1 to 5.0
