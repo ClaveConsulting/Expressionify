@@ -20,16 +20,14 @@ namespace Clave.Expressionify
         }
         
         public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
-        public ExpressionEvaluationMode EvaluationMode { get; private set; } = ExpressionEvaluationMode.LimitedCompatibilityButCached;
+        public ExpressionEvaluationMode EvaluationMode { get; private set; } = ExpressionEvaluationMode.Cached;
 
         public void ApplyServices(IServiceCollection services)
         {
-            if (EvaluationMode == ExpressionEvaluationMode.FullCompatibilityButSlow)
+            if (EvaluationMode == ExpressionEvaluationMode.Always)
                 AddDecorator<IQueryCompiler, ExpressionableQueryCompiler>(services);
-
-            else if (EvaluationMode == ExpressionEvaluationMode.LimitedCompatibilityButCached)
+            else if (EvaluationMode == ExpressionEvaluationMode.Cached)
                 AddDecorator<IQueryTranslationPreprocessorFactory, ExpressionifyQueryTranslationPreprocessorFactory>(services);
-
             else
                 throw new NotSupportedException($"Unsupported {nameof(EvaluationMode)}");
         }

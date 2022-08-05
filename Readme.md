@@ -102,7 +102,7 @@ However, this comes with [some limitations](#query-caching-limitations). Express
 To fix this, you either have to call `.Expressionify()` explicitly on the query or disable query caching:
 
 ```csharp
-.UseExpressionify(o => o.WithEvaluationMode(ExpressionEvaluationMode.FullCompatibilityButSlow));
+.UseExpressionify(o => o.WithEvaluationMode(ExpressionEvaluationMode.Always));
 ```
 
 ## Upgrading from 3.1 to 5.0
@@ -159,34 +159,34 @@ Examples:
 ```csharp
 public static partial class Extensions {
    // Example: users.Where(u => u.IsOver18())
-   // ✔ OK for ExpressionEvaluationMode.FullCompatibilityButSlow
-   // ✔ OK for ExpressionEvaluationMode.LimitedCompatibilityButCached
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ✔ OK for ExpressionEvaluationMode.Cached
    // The expression can be translated to SQL without introducing new parameters
    [Expressionify]
    public static bool IsOver18(this User user)
        => user.DateOfBirth < DateTime.Now.AddYears(-18);
 
    // Example: users.Where(u => u.IsOlderThan(18))
-   // ✔ OK for ExpressionEvaluationMode.FullCompatibilityButSlow
-   // ✔ OK for ExpressionEvaluationMode.LimitedCompatibilityButCached
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ✔ OK for ExpressionEvaluationMode.Cached
    // The parameter 'years' is already present in the query itself. No new parameters are introduced when expanding the query.
    [Expressionify]
    public static bool IsOlderThan(this User user, int years)
        => user.DateOfBirth < DateTime.Now.AddYears(-years);
 
    // Example: users.Where(u => u.WasAddedRecently())
-   // ✔ OK for ExpressionEvaluationMode.FullCompatibilityButSlow
-   // ❌ Not ok for ExpressionEvaluationMode.LimitedCompatibilityButCached
-   // ✔ OK for ExpressionEvaluationMode.LimitedCompatibilityButCached when explicitly expanding the query with 'query.Expressionify()'
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ❌ Not ok for ExpressionEvaluationMode.Cached
+   // ✔ OK for ExpressionEvaluationMode.Cached when explicitly expanding the query with 'query.Expressionify()'
    // 'TimeProvider.UtcNow' is a new parameter that is not known in the query before calling '.Expressionify()'.
    [Expressionify]
    public static bool WasAddedRecently(this User user)
        => user.Created >= TimeProvider.UtcNow.AddDays(-1);
 
    // Example: users.Select(u => u.ToTestView(null))
-   // ✔ OK for ExpressionEvaluationMode.FullCompatibilityButSlow
-   // ❌ Not ok for ExpressionEvaluationMode.LimitedCompatibilityButCached
-   // ✔ OK for ExpressionEvaluationMode.LimitedCompatibilityButCached when explicitly expanding the query with 'query.Expressionify()'
+   // ✔ OK for ExpressionEvaluationMode.Always
+   // ❌ Not ok for ExpressionEvaluationMode.Cached
+   // ✔ OK for ExpressionEvaluationMode.Cached when explicitly expanding the query with 'query.Expressionify()'
    // With the input 'null' on the address, the expression 'address == null ? null : address.Street' gets replaced with a
    // new parameter for the value 'null'.
    [Expressionify]
