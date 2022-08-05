@@ -25,15 +25,13 @@ namespace Clave.Expressionify
             query = visitor.Visit(query);
 
             if (visitor.HasReplacedCalls)
-               query = EvaluateExpression(query);
+               EnsureNoNewParametersExist(query);
 
             return _innerPreprocessor.Process(query);
         }
 
-        private Expression EvaluateExpression(Expression query)
+        private void EnsureNoNewParametersExist(Expression query)
         {
-            // 1) Ensure that no new parameters are introduced when creating the query
-            // 2) This expression visitor also makes slight optimzations, like replacing evaluatable expressions.
             var visitor = new ParameterExtractingExpressionVisitor(
                 Dependencies.EvaluatableExpressionFilter,
                 new ThrowOnParameterAccess(),
@@ -43,7 +41,7 @@ namespace Clave.Expressionify
                 parameterize: true,
                 generateContextAccessors: false);
 
-            return visitor.ExtractParameters(query);
+            visitor.ExtractParameters(query);
         }
 
         private class ThrowOnParameterAccess : IParameterValues
