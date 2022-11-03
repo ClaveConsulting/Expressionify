@@ -109,7 +109,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Where(e => e.IsSomething());
 
             var exception = Should.Throw<InvalidOperationException>(() => query.ToQueryString());
-            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.Always.");
+            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
         }
 
         [Test]
@@ -119,15 +119,15 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Where(e => e.IsSomething());
 
             var exception = Should.Throw<InvalidOperationException>(() => query.ToQueryString());
-            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.Always.");
+            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
         }
 
         [Test]
         public void UseExpressionify_ShouldProduceSameOutputAsExpressionify()
         {
             using var dbContext = new TestDbContext(GetOptions());
-            var queryA = dbContext.TestEntities.Where(e => e.IsSomething());
-            var queryB = dbContext.TestEntities.Expressionify().Where(e => e.IsSomething());
+            var queryA = dbContext.TestEntities.Where(e => e.IsJohnDoe());
+            var queryB = dbContext.TestEntities.Expressionify().Where(e => e.IsJohnDoe());
 
             queryA.ToQueryString().ShouldBe(queryB.ToQueryString());
         }
@@ -161,7 +161,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Select(e => e.ToTestView(null));
 
             var exception = Should.Throw<InvalidOperationException>(() => query.ToQueryString());
-            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.Always.");
+            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
         }
 
         [TestCase(ExpressionEvaluationMode.FullCompatibilityButSlow)]
@@ -178,7 +178,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
         }
 
         [Test]
-        public void UseExpressionify_EvaluationMode_DefaultsToAlways()
+        public void UseExpressionify_EvaluationMode_DefaultsToLimitedCompatibilityButCached()
         {
             var options = GetOptions();
             var extension = options.FindExtension<ExpressionifyDbContextOptionsExtension>()!;
@@ -186,7 +186,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var debugInfo = new Dictionary<string, string>();
             extension.Info.PopulateDebugInfo(debugInfo);
             
-            debugInfo["Expressionify:EvaluationMode"].ShouldBe(ExpressionEvaluationMode.FullCompatibilityButSlow.ToString());
+            debugInfo["Expressionify:EvaluationMode"].ShouldBe(ExpressionEvaluationMode.LimitedCompatibilityButCached.ToString());
         }
 
         private DbContextOptions GetOptions(Action<ExpressionifyDbContextOptionsBuilder>? optionsAction = null, bool useExpressionify = true)

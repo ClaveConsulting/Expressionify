@@ -50,11 +50,13 @@ namespace Clave.Expressionify
         {
             public void AddParameter(string name, object? value)
                 => throw new InvalidOperationException(
-                    "Adding parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.Always.");
+                    "Adding parameters in a cached query context is not allowed. " +
+                    $"Explicitly call .{nameof(ExpressionifyExtension.Expressionify)}() on the query or use {nameof(ExpressionEvaluationMode)}.{nameof(ExpressionEvaluationMode.FullCompatibilityButSlow)}.");
         
             public IReadOnlyDictionary<string, object?> ParameterValues
                 => throw new InvalidOperationException(
-                    "Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.Always.");
+                    "Accessing parameters in a cached query context is not allowed. " +
+                    $"Explicitly call .{nameof(ExpressionifyExtension.Expressionify)}() on the query or use {nameof(ExpressionEvaluationMode)}.{nameof(ExpressionEvaluationMode.FullCompatibilityButSlow)}.");
         }
     }
 }
