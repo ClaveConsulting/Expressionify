@@ -21,6 +21,7 @@ namespace Clave.Expressionify.Generator.Tests
             }
         }";
 
+        // Normal scenario
         [TestCase(@"namespace ConsoleApplication1
 {
     public partial class Extensions
@@ -29,26 +30,34 @@ namespace Clave.Expressionify.Generator.Tests
         public static int Foo(int x) => 8;
     }
 }",
-@"namespace ConsoleApplication1
+@"#nullable enable
+
+namespace ConsoleApplication1
 {
     public partial class Extensions
     {
         private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
     }
 }", TestName = "Normal scenario")]
+
+        // File scoped namespace
         [TestCase(@"namespace ConsoleApplication1;
-    public partial class Extensions
-    {
-        [Expressionify]
-        public static int Foo(int x) => 8;
-    }",
-@"namespace ConsoleApplication1
+public partial class Extensions
+{
+    [Expressionify]
+    public static int Foo(int x) => 8;
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
 {
     public partial class Extensions
     {
         private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
     }
-}", TestName = "Nested class")]
+}", TestName = "File scoped namespace")]
+
+        // Nested class
         [TestCase(@"namespace ConsoleApplication1
 {
     public partial class Extensions
@@ -62,8 +71,10 @@ namespace Clave.Expressionify.Generator.Tests
             public static int Foo(int x) => 8;
         }
     }
-}",
-@"namespace ConsoleApplication1
+}", 
+    @"#nullable enable
+
+namespace ConsoleApplication1
 {
     public partial class Extensions
     {
@@ -73,7 +84,49 @@ namespace Clave.Expressionify.Generator.Tests
             private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
         }
     }
-}", TestName = "File scoped namespace")]
+}", TestName = "Nested class")]
+
+        // Nullable
+        [TestCase(@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        [Expressionify]
+        public static string? Foo(int x) => x < 10 ? null : ""bar"";
+    }
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        private static System.Linq.Expressions.Expression<System.Func<int, string?>> Foo_Expressionify_0 { get; } = (int x) => x < 10 ? null : ""bar"";
+    }
+}", TestName = "Nullable")]
+
+        // Nullable enabled but not used
+        [TestCase(@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        [Expressionify]
+        public static string Foo(int x) => ""bar"";
+    }
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        private static System.Linq.Expressions.Expression<System.Func<int, string>> Foo_Expressionify_0 { get; } = (int x) => ""bar"";
+    }
+}", TestName = "Nullable enabled but not used")]
         public async Task TestGenerator(string source, string generated)
         {
             await VerifyGenerated(source, generated);
@@ -88,7 +141,7 @@ namespace Clave.Expressionify.Generator.Tests
                     Sources = { source, AttributeCode },
                     GeneratedSources =
                     {
-                        (typeof(ExpressionifySourceGenerator), "Test0_expressionify_0.cs", SourceText.From(generated.Replace(Environment.NewLine, "\r\n"), Encoding.UTF8, SourceHashAlgorithm.Sha1)),
+                        (typeof(ExpressionifySourceGenerator), "Test0_expressionify_0.g.cs", SourceText.From(generated.Replace(Environment.NewLine, "\r\n"), Encoding.UTF8, SourceHashAlgorithm.Sha1)),
                     }
                 }
             }.RunAsync();

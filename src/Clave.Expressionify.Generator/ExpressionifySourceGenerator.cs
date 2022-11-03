@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -14,6 +14,8 @@ namespace Clave.Expressionify.Generator
     [Generator]
     public class ExpressionifySourceGenerator : ISourceGenerator
     {
+        private static readonly string NullableDirective = "#nullable enable" + Environment.NewLine + Environment.NewLine;
+
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => new ExpressionifySyntaxReceiver());
@@ -26,13 +28,13 @@ namespace Clave.Expressionify.Generator
         }
 
         private record Expressioned(
-            MethodDeclarationSyntax Original, 
-            PropertyDeclarationSyntax Replaced, 
+            MethodDeclarationSyntax Original,
+            PropertyDeclarationSyntax Replaced,
             (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
         {
             public static Expressioned Create(MethodDeclarationSyntax m) => new(
-                m, 
-                m.ToExpressionProperty(), 
+                m,
+                m.ToExpressionProperty(),
                 m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
         }
 
@@ -59,7 +61,11 @@ namespace Clave.Expressionify.Generator
 
                 foreach (var (path, source) in replacedTypes)
                 {
-                    context.AddSource(Path.GetFileNameWithoutExtension(path)+$"_expressionify_{i++}.cs", SourceText.From(source.ToFullString(), Encoding.UTF8));
+                    var sourceCode = NullableDirective + source.ToFullString();
+
+                    context.AddSource(
+                        Path.GetFileNameWithoutExtension(path) + $"_expressionify_{i++}.g.cs",
+                        SourceText.From(sourceCode, Encoding.UTF8));
                 }
             }
             catch (Exception e)
