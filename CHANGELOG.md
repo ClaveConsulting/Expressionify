@@ -1,3 +1,21 @@
+## **6.6.0** <sub><sup>2022-11-04 ([e0c50b9...118d2eb](https://github.com/ClaveConsulting/Expressionify/compare/e0c50b9...118d2eb?diff=split))</sup></sub>
+
+### Features
+*  Added support for the EF compiled query cachen when using \.UseExpressionify\(\) ([e0c50b9](https://github.com/ClaveConsulting/Expressionify/commit/e0c50b9))
+
+
+### Bug Fixes
+*  Mark Generator as development dependency ([d8650c2](https://github.com/ClaveConsulting/Expressionify/commit/d8650c2))
+*  Fixed failing tests and an outdated exception message ([1a82a24](https://github.com/ClaveConsulting/Expressionify/commit/1a82a24))
+*  Running tests against the pull request, not the target ([118d2eb](https://github.com/ClaveConsulting/Expressionify/commit/118d2eb))
+
+
+### ???
+*  Use result of ParameterExtractingExpressionVisitor ([6de12cc](https://github.com/ClaveConsulting/Expressionify/commit/6de12cc))
+*  Default query caching ([c56b4d3](https://github.com/ClaveConsulting/Expressionify/commit/c56b4d3))
+*  Renamed ExpressionEvaluationMode enums ([07f00a8](https://github.com/ClaveConsulting/Expressionify/commit/07f00a8))
+
+
 ## **6.5.0** <sub><sup>2022-04-29 ([b8b62c1...b8b62c1](https://github.com/ClaveConsulting/Expressionify/compare/b8b62c1...b8b62c1?diff=split))</sup></sub>
 
 ### Features
