@@ -14,9 +14,7 @@ namespace Clave.Expressionify.Generator
     [Generator]
     public class ExpressionifySourceGenerator : ISourceGenerator
     {
-        private static readonly string NullableDirective = @"#nullable enable
-
-";
+        private static readonly string NullableDirective = "#nullable enable\r\n\r\n";
 
         public void Initialize(GeneratorInitializationContext context)
         {
