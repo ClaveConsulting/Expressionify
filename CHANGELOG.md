@@ -1,3 +1,14 @@
+## **6.6.1** <sub><sup>2022-12-12 ([6ae459e...2f5c15f](https://github.com/ClaveConsulting/Expressionify/compare/6ae459e...2f5c15f?diff=split))</sup></sub>
+
+### Bug Fixes
+*  Generated source files end in \.g\.cs ([6ae459e](https://github.com/ClaveConsulting/Expressionify/commit/6ae459e))
+*  tests ([2f5c15f](https://github.com/ClaveConsulting/Expressionify/commit/2f5c15f))
+
+
+### ???
+*  Replacing Environment\.NewLine with actual new lines to make Git handle line ending differences between platforms\. Ref https://github\.com/dotnet/roslyn/issues/51437\#issuecomment\-784750434 ([aa1a1b5](https://github.com/ClaveConsulting/Expressionify/commit/aa1a1b5))
+
+
 ## **6.6.0** <sub><sup>2022-11-04 ([e0c50b9...118d2eb](https://github.com/ClaveConsulting/Expressionify/compare/e0c50b9...118d2eb?diff=split))</sup></sub>
 
 ### Features
