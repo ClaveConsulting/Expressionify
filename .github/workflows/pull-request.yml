@@ -89,7 +89,8 @@ jobs:
           message: |
             The following versions will be created when this pull-request is merged:
             ${{ needs.version.outputs.changelog }}
-            Pre-release package ${{ needs.version.outputs.version }} can be pushed to nuget
+            ---
+            Pre-release package `${{ needs.version.outputs.version }}` can be pushed to nuget
 
       - uses: marocchino/sticky-pull-request-comment@v1
         if: needs.version.outputs.changelog == ''
@@ -103,6 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: pre-release
     needs: test
+    timeout-minutes: 30
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
