@@ -34,7 +34,7 @@ jobs:
     name: Get version
     outputs:
       version: ${{ steps.version.outputs.version }}
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       # Checkout all commits, so we get previous tags
       # The ref and repository is needed since we use on: pull_request_target
@@ -43,10 +43,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
-
-      # This is needed because pull-requests don't run on branches
-      # so we create a new branch to work on
-      - run: git switch -c "pull-request"
 
       - uses: actions/setup-node@v1
         with:
@@ -62,7 +58,7 @@ jobs:
         id: version
         run: |
           echo 'version<<EOF' >> $GITHUB_OUTPUT
-          type temp_changelog.md >> $GITHUB_OUTPUT
+          cat temp_changelog.md >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   comment:
