@@ -16,9 +16,9 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestClass()
         {
-            var prop = typeof(Class1).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
+            var prop = typeof(Class1).GetMethod("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop.ShouldNotBeNull();
-            var expr = prop.GetValue(null) as Expression<Func<int, int>>;
+            var expr = prop.Invoke(null, Array.Empty<object>()) as Expression<Func<int, int>>;
             expr.ShouldNotBeNull();
             expr.Compile().Invoke(1).ShouldBe(8);
         }
@@ -26,9 +26,9 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestRecord()
         {
-            var prop = typeof(Record1).GetProperty("Create_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
+            var prop = typeof(Record1).GetMethod("Create_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop.ShouldNotBeNull();
-            var expr = prop.GetValue(null) as Expression<Func<string, Record1>>;
+            var expr = prop.Invoke(null, Array.Empty<object>()) as Expression<Func<string, Record1>>;
             expr.ShouldNotBeNull();
             expr.Compile().Invoke("test").ShouldBe(new Record1("test"));
         }
@@ -42,17 +42,17 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestOverload()
         {
-            typeof(Class3).GetProperties(BindingFlags.NonPublic|BindingFlags.Static).ShouldNotBeEmpty();
+            typeof(Class3).GetMethods(BindingFlags.NonPublic|BindingFlags.Static).ShouldNotBeEmpty();
 
-            var prop0 = typeof(Class3).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
+            var prop0 = typeof(Class3).GetMethod("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop0.ShouldNotBeNull();
-            var expr0 = prop0.GetValue(null) as Expression<Func<int, int>>;
+            var expr0 = prop0.Invoke(null, Array.Empty<object>()) as Expression<Func<int, int>>;
             expr0.ShouldNotBeNull();
             expr0.Compile().Invoke(1).ShouldBe(8);
 
-            var prop1 = typeof(Class3).GetProperty("Foo_Expressionify_1", BindingFlags.NonPublic | BindingFlags.Static);
+            var prop1 = typeof(Class3).GetMethod("Foo_Expressionify_1", BindingFlags.NonPublic | BindingFlags.Static);
             prop1.ShouldNotBeNull();
-            var expr1 = prop1.GetValue(null) as Expression<Func<string, int>>;
+            var expr1 = prop1.Invoke(null, Array.Empty<object>()) as Expression<Func<string, int>>;
             expr1.ShouldNotBeNull();
             expr1.Compile().Invoke("test").ShouldBe(0);
         }
@@ -60,17 +60,17 @@ namespace Clave.Expressionify.Tests
         [Test]
         public void TestMethodGroup()
         {
-            typeof(Class4).GetProperties(BindingFlags.NonPublic | BindingFlags.Static).ShouldNotBeEmpty();
+            typeof(Class4).GetMethods(BindingFlags.NonPublic | BindingFlags.Static).ShouldNotBeEmpty();
 
-            var prop0 = typeof(Class4).GetProperty("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
+            var prop0 = typeof(Class4).GetMethod("Foo_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop0.ShouldNotBeNull();
-            var expr0 = prop0.GetValue(null) as Expression<Func<string, int>>;
+            var expr0 = prop0.Invoke(null, Array.Empty<object>()) as Expression<Func<string, int>>;
             expr0.ShouldNotBeNull();
             expr0.Compile().Invoke("1").ShouldBe(8);
 
-            var prop1 = typeof(Class4).GetProperty("Something_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
+            var prop1 = typeof(Class4).GetMethod("Something_Expressionify_0", BindingFlags.NonPublic | BindingFlags.Static);
             prop1.ShouldNotBeNull();
-            var expr1 = prop1.GetValue(null) as Expression<Func<IEnumerable<string>, int>>;
+            var expr1 = prop1.Invoke(null, Array.Empty<object>()) as Expression<Func<IEnumerable<string>, int>>;
             expr1.ShouldNotBeNull();
             expr1.Compile().Invoke(new[] { "test" }).ShouldBe(8);
         }
@@ -218,6 +218,24 @@ namespace Clave.Expressionify.Tests
             var secondTime = sw.Elapsed;
 
             secondTime.ShouldBeLessThan(firstTime);
+        }
+
+        [Test]
+        public void TestGenericExpression()
+        {
+            var data = new IThing[]
+            {
+                new Thing1(),
+                new Thing2(),
+                new Thing1()
+            };
+
+            var result = data.AsQueryable()
+                .Expressionify()
+                .Select(x => x.GetName())
+                .ToList();
+
+            result.ShouldBe(new[] { "Thing1", "Thing2", "Thing1" });
         }
     }
 }
