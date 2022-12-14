@@ -18,10 +18,11 @@ namespace Clave.Expressionify
         {
             EvaluationMode = copyFrom.EvaluationMode;
         }
-        
+
         public DbContextOptionsExtensionInfo Info => new ExtensionInfo(this);
         public ExpressionEvaluationMode EvaluationMode { get; private set; } = ExpressionEvaluationMode.LimitedCompatibilityButCached;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>")]
         public void ApplyServices(IServiceCollection services)
         {
             if (EvaluationMode == ExpressionEvaluationMode.FullCompatibilityButSlow)
@@ -90,7 +91,7 @@ namespace Clave.Expressionify
             public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
             {
                 // Check if all options are the same
-                return other is ExtensionInfo otherInfo 
+                return other is ExtensionInfo otherInfo
                     && otherInfo._extension.EvaluationMode == _extension.EvaluationMode;
             }
 

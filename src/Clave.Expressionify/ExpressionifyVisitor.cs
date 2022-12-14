@@ -47,7 +47,16 @@ namespace Clave.Expressionify
                 return MethodToExpressionMap[method] = null;
             }
 
-            var methods = method.DeclaringType?.GetRuntimeMethods();
+            var declaringType = method.DeclaringType!;
+
+            if (declaringType.IsGenericType)
+            {
+                declaringType = declaringType
+                    .GetGenericTypeDefinition()
+                    .MakeGenericType(declaringType.GenericTypeArguments);
+            }
+
+            var methods = declaringType.GetRuntimeMethods();
 
             var expression = methods
                 ?.Where(m => m.Name.StartsWith($"{method.Name}_Expressionify_"))

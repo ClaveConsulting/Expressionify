@@ -163,7 +163,7 @@ namespace Clave.Expressionify.Generator.Tests
                     public class ExpressionifyAttribute : System.Attribute {}
                 }";
 
-            //await Verify.VerifyCodeFixAsync(test, expected, fixtest);
+            await Verify.VerifyCodeFixAsync(test, expected, fixtest);
         }
     }
 }
