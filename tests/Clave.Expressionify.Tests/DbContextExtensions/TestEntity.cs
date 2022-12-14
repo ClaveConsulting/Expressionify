@@ -5,19 +5,19 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
     public class TestEntity
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public DateTime Created { get; set; }
     }
 
     public class TestAddress
     {
-        public string City { get; set; }
-        public string Street { get; set; }
+        public string? City { get; set; }
+        public string? Street { get; set; }
     }
 
     public class TestView
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public string? Street { get; set; }
     }
 

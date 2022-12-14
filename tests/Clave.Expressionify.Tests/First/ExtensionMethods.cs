@@ -1,4 +1,5 @@
 using System;
+using Clave.Expressionify.Tests.Samples;
 
 namespace Clave.Expressionify.Tests.First
 {
@@ -18,5 +19,8 @@ namespace Clave.Expressionify.Tests.First
 
         [Expressionify]
         public static double Squared(this double a) => a * a;
+
+        [Expressionify]
+        public static string GetName<T>(this T thing) where T : IThing => thing.Name;
     }
 }

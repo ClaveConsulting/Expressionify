@@ -30,7 +30,7 @@ namespace Clave.Expressionify.Generator
             var diagnosticSpan = diagnostic.Location;
 
             // Find the type declaration identified by the diagnostic.
-            var syntaxNode = root.FindNode(diagnostic.Location.SourceSpan);
+            var syntaxNode = root!.FindNode(diagnostic.Location.SourceSpan);
 
             if (diagnostic.Id == ExpressionifyAnalyzer.StaticId)
                 context.RegisterCodeFix(

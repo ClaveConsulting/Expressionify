@@ -66,7 +66,6 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
         [TestCase(ExpressionEvaluationMode.LimitedCompatibilityButCached)]
         public void UseExpressionify_ShouldHandleConstants(ExpressionEvaluationMode mode)
         {
-            var name = "oh hi";
             using var dbContext = new TestDbContext(GetOptions(o => o.WithEvaluationMode(mode)));
             var query = dbContext.TestEntities.Where(e => e.IsJohnDoe());
 
@@ -170,10 +169,10 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
         {
             var options = GetOptions(o => o.WithEvaluationMode(mode));
             var extension = options.FindExtension<ExpressionifyDbContextOptionsExtension>()!;
-            
+
             var debugInfo = new Dictionary<string, string>();
             extension.Info.PopulateDebugInfo(debugInfo);
-            
+
             debugInfo["Expressionify:EvaluationMode"].ShouldBe(mode.ToString());
         }
 
@@ -182,10 +181,10 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
         {
             var options = GetOptions();
             var extension = options.FindExtension<ExpressionifyDbContextOptionsExtension>()!;
-            
+
             var debugInfo = new Dictionary<string, string>();
             extension.Info.PopulateDebugInfo(debugInfo);
-            
+
             debugInfo["Expressionify:EvaluationMode"].ShouldBe(ExpressionEvaluationMode.LimitedCompatibilityButCached.ToString());
         }
 

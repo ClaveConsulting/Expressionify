@@ -29,12 +29,12 @@ namespace Clave.Expressionify.Generator
 
         private record Expressioned(
             MethodDeclarationSyntax Original,
-            PropertyDeclarationSyntax Replaced,
+            MethodDeclarationSyntax Replaced,
             (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
         {
             public static Expressioned Create(MethodDeclarationSyntax m) => new(
                 m,
-                m.ToExpressionProperty(),
+                m.ToExpressionMethod(),
                 m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
         }
 
@@ -47,7 +47,7 @@ namespace Clave.Expressionify.Generator
                 static MemberDeclarationSyntax[] Group(IEnumerable<Expressioned> methods) =>
                     methods
                         .GroupBy(x => x.Path?.Head, x => x with { Path = x.Path?.Tail.HeadAndTail() })
-                        .Select(g => g.Key.WithOnlyTheseMembers(g
+                        .Select(g => g.Key!.WithOnlyTheseMembers(g
                             .Where(x => x.Path is null)
                             .Select(x => x.Replaced)
                             .GroupBy(p => p.Identifier.Text)
