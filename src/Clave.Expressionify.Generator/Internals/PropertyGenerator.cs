@@ -14,30 +14,40 @@ namespace Clave.Expressionify.Generator.Internals
             return p.WithIdentifier(Identifier($"{p.Identifier.Text}_Expressionify_{i}"));
         }
 
+        public static MethodDeclarationSyntax GeneratedName(this MethodDeclarationSyntax p, int i)
+        {
+            return p.WithIdentifier(Identifier($"{p.Identifier.Text}_Expressionify_{i}"));
+        }
+
         public static PropertyDeclarationSyntax ToExpressionProperty(this MethodDeclarationSyntax method)
         {
-            var parameterTypes = method.ParameterList.Parameters
-                .Select(p => p.Type)
-                .Concat(new[] { method.ReturnType });
-
-            var type = GetExpressionType(parameterTypes);
-
-            return PropertyDeclaration(type, method.Identifier.ValueText)
+            return PropertyDeclaration(GetExpressionType(method), method.Identifier.ValueText)
                 .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
                 .WithAccessorList(GetOnly())
-                .WithInitializer(GetBody(method))
+                .WithInitializer(EqualsValueClause(GetBody(method)))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
                 .WithTrailingTrivia(Whitespace("\n"));
         }
 
-        private static EqualsValueClauseSyntax GetBody(BaseMethodDeclarationSyntax method)
+        public static MethodDeclarationSyntax ToExpressionMethod(this MethodDeclarationSyntax method)
         {
-            return EqualsValueClause(
+            return MethodDeclaration(GetExpressionType(method), method.Identifier)
+                .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
+                .WithTypeParameterList(method.TypeParameterList)
+                .WithConstraintClauses(method.ConstraintClauses)
+                .WithExpressionBody(ArrowExpressionClause(GetBody(method)))
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                .NormalizeWhitespace();
+        }
+
+        private static ParenthesizedLambdaExpressionSyntax GetBody(BaseMethodDeclarationSyntax method)
+        {
+            return
                 ParenthesizedLambdaExpression(
                     ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList())))),
                     method.ExpressionBody!.Expression
                 )
-            );
+            ;
         }
 
         public static AccessorListSyntax GetOnly() =>
@@ -49,10 +59,12 @@ namespace Clave.Expressionify.Generator.Internals
                 Token(SyntaxKind.CloseBraceToken)
             );
 
-        private static QualifiedNameSyntax GetExpressionType(IEnumerable<TypeSyntax> parameters) =>
+        private static QualifiedNameSyntax GetExpressionType(MethodDeclarationSyntax method) =>
             Expression(TypeArgumentList(
                 SingletonSeparatedList<TypeSyntax>(Func(TypeArgumentList(
-                    SeparatedList(parameters))))));
+                    SeparatedList(method.ParameterList.Parameters
+                        .Select(p => p.Type!)
+                        .Concat(new[] { method.ReturnType })))))));
 
         private static QualifiedNameSyntax Func(TypeArgumentListSyntax types) =>
             QualifiedName(System,

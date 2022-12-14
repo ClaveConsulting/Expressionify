@@ -36,7 +36,7 @@ namespace ConsoleApplication1
 {
     public partial class Extensions
     {
-        private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
+        private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0() => (int x) => 8;
     }
 }", TestName = "Normal scenario")]
 
@@ -53,7 +53,7 @@ namespace ConsoleApplication1
 {
     public partial class Extensions
     {
-        private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
+        private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0() => (int x) => 8;
     }
 }", TestName = "File scoped namespace")]
 
@@ -71,17 +71,17 @@ namespace ConsoleApplication1
             public static int Foo(int x) => 8;
         }
     }
-}", 
+}",
     @"#nullable enable
 
 namespace ConsoleApplication1
 {
     public partial class Extensions
     {
-        private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
+        private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0() => (int x) => 8;
         public partial class Nested
         {
-            private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0 { get; } = (int x) => 8;
+            private static System.Linq.Expressions.Expression<System.Func<int, int>> Foo_Expressionify_0() => (int x) => 8;
         }
     }
 }", TestName = "Nested class")]
@@ -103,7 +103,7 @@ namespace ConsoleApplication1
 {
     public partial class Extensions
     {
-        private static System.Linq.Expressions.Expression<System.Func<int, string?>> Foo_Expressionify_0 { get; } = (int x) => x < 10 ? null : ""bar"";
+        private static System.Linq.Expressions.Expression<System.Func<int, string?>> Foo_Expressionify_0() => (int x) => x < 10 ? null : ""bar"";
     }
 }", TestName = "Nullable")]
 
@@ -124,9 +124,46 @@ namespace ConsoleApplication1
 {
     public partial class Extensions
     {
-        private static System.Linq.Expressions.Expression<System.Func<int, string>> Foo_Expressionify_0 { get; } = (int x) => ""bar"";
+        private static System.Linq.Expressions.Expression<System.Func<int, string>> Foo_Expressionify_0() => (int x) => ""bar"";
     }
 }", TestName = "Nullable enabled but not used")]
+
+        [TestCase(@"namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        [Expressionify]
+        public static string Foo<T>(T x) => ""bar"";
+    }
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        private static System.Linq.Expressions.Expression<System.Func<T, string>> Foo_Expressionify_0<T>() => (T x) => ""bar"";
+    }
+}", TestName = "Generic extension method")]
+
+        [TestCase(@"namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        [Expressionify]
+        public static string Foo<T>(T x) where T : System.Collections.IEnumerable => ""bar"";
+    }
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions
+    {
+        private static System.Linq.Expressions.Expression<System.Func<T, string>> Foo_Expressionify_0<T>()
+            where T : System.Collections.IEnumerable => (T x) => ""bar"";
+    }
+}", TestName = "Generic extension method with constraints")]
         public async Task TestGenerator(string source, string generated)
         {
             await VerifyGenerated(source, generated);
