@@ -29,12 +29,12 @@ namespace Clave.Expressionify.Generator
 
         private record Expressioned(
             MethodDeclarationSyntax Original,
-            PropertyDeclarationSyntax Replaced,
+            MethodDeclarationSyntax Replaced,
             (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
         {
             public static Expressioned Create(MethodDeclarationSyntax m) => new(
                 m,
-                m.ToExpressionProperty(),
+                m.ToExpressionMethod(),
                 m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
         }
 

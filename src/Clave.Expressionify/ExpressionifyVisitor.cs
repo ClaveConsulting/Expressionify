@@ -47,28 +47,30 @@ namespace Clave.Expressionify
                 return MethodToExpressionMap[method] = null;
             }
 
-            var properties = method.DeclaringType?.GetRuntimeProperties();
-            var expression = properties
-                ?.Where(x => x.Name.StartsWith($"{method.Name}_Expressionify_"))
-                .FirstOrDefault(x => x.MatchesTypeOf(method))
-                ?.GetValue(null);
+            var methods = method.DeclaringType?.GetRuntimeMethods();
 
-            if (expression is null)
+            var expression = methods
+                ?.Where(m => m.Name.StartsWith($"{method.Name}_Expressionify_"))
+                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(method.GetGenericArguments()) : m)
+                .FirstOrDefault(m => m.MatchesTypeOf(method))
+                ?.Invoke(null, Array.Empty<object>());
+
+            if (expression is LambdaExpression lambdaExpression)
             {
-                throw new Exception($"Code generation seems to have failed, could not find expresion for method {GetFullName(method.DeclaringType)}.{method.Name}()");
+                return MethodToExpressionMap[method] = lambdaExpression;
             }
 
-            return MethodToExpressionMap[method] = expression as LambdaExpression;
+            throw new Exception($"Code generation seems to have failed, could not find expresion for method {GetFullName(method.DeclaringType)}.{method.Name}()");
         }
 
-        private static string GetFullName(Type type)
+        private static string GetFullName(Type? type)
         {
-            if(type.DeclaringType is Type parent)
+            if(type?.DeclaringType is Type parent)
             {
                 return GetFullName(parent) + "." + type.Name;
             }
 
-            return type.Name;
+            return type?.Name ?? "???";
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
