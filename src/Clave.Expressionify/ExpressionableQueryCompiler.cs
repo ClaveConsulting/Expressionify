@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Clave.Expressionify
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>")]
     public class ExpressionableQueryCompiler : IQueryCompiler
     {
         private readonly IQueryCompiler _decoratedCompiler;

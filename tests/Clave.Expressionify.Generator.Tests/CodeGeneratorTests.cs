@@ -164,6 +164,24 @@ namespace ConsoleApplication1
             where T : System.Collections.IEnumerable => (T x) => ""bar"";
     }
 }", TestName = "Generic extension method with constraints")]
+
+        [TestCase(@"namespace ConsoleApplication1
+{
+    public partial class Extensions<T>
+    {
+        [Expressionify]
+        public static string Foo(T x) => ""bar"";
+    }
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    public partial class Extensions<T>
+    {
+        private static System.Linq.Expressions.Expression<System.Func<T, string>> Foo_Expressionify_0() => (T x) => ""bar"";
+    }
+}", TestName = "Generic type")]
         public async Task TestGenerator(string source, string generated)
         {
             await VerifyGenerated(source, generated);

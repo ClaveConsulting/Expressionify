@@ -237,5 +237,23 @@ namespace Clave.Expressionify.Tests
 
             result.ShouldBe(new[] { "Thing1", "Thing2", "Thing1" });
         }
+
+        [Test]
+        public void TestGenericType()
+        {
+            var data = new string[]
+            {
+                "1",
+                "2",
+                "3"
+            };
+
+            var result = data.AsQueryable()
+                .Expressionify()
+                .Select(x => GenericClass<string>.Foo(x))
+                .ToList();
+
+            result.ShouldBe(new[] { 8, 8, 8 });
+        }
     }
 }

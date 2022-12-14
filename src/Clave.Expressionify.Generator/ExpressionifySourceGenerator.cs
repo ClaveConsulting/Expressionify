@@ -47,7 +47,7 @@ namespace Clave.Expressionify.Generator
                 static MemberDeclarationSyntax[] Group(IEnumerable<Expressioned> methods) =>
                     methods
                         .GroupBy(x => x.Path?.Head, x => x with { Path = x.Path?.Tail.HeadAndTail() })
-                        .Select(g => g.Key.WithOnlyTheseMembers(g
+                        .Select(g => g.Key!.WithOnlyTheseMembers(g
                             .Where(x => x.Path is null)
                             .Select(x => x.Replaced)
                             .GroupBy(p => p.Identifier.Text)
