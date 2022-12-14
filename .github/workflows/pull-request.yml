@@ -96,3 +96,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
             No packages will be created when this pull-request is merged
+
+  publish:
+    name: Publish pre-release
+    runs-on: ubuntu-latest
+    environment: pre-release
+    needs: test
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: package
+          path: './nuget'
+
+      - name: Push
+        run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET }} --source https://api.nuget.org/v3/index.json --skip-duplicate
