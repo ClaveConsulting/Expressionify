@@ -73,9 +73,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
             The following versions will be created when this pull-request is merged:
-            ```
             ${{ needs.version.outputs.version }}
-            ```
+
       - uses: marocchino/sticky-pull-request-comment@v1
         if: needs.version.outputs.version == ''
         with:

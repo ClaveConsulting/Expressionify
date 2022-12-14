@@ -26,6 +26,7 @@
     ],
     "commitScopes": [],
     "commitIgnoreRegexPattern": "^(WIP|chore)",
+    "includeInvalidCommits": false,
     "headlines": {
       "feat": "Features",
       "fix": "Bug Fixes",
