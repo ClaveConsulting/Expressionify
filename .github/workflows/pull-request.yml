@@ -4,6 +4,7 @@ on: pull_request_target
 
 jobs:
   test:
+    name: Run unit tests
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,6 +31,7 @@ jobs:
           path: '**/test-results.trx'
 
   version:
+    name: Get version
     outputs:
       version: ${{ steps.version.outputs.version }}
     runs-on: windows-latest
@@ -41,6 +43,10 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
+
+      # This is needed because pull-requests don't run on branches
+      # so we create a new branch to work on
+      - run: git switch -c "pull-request"
 
       - uses: actions/setup-node@v1
         with:
@@ -60,6 +66,7 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
 
   comment:
+    name: Comment on pull-request
     runs-on: ubuntu-latest
     needs: version
     steps:
