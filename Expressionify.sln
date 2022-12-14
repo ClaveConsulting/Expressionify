@@ -16,8 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.build.targets = Directory.build.targets
 		git-conventional-commits.json = git-conventional-commits.json
 		.github\workflows\publish.yml = .github\workflows\publish.yml
-		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
 		Readme.md = Readme.md
+		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
 		.github\workflows\test-report.yml = .github\workflows\test-report.yml
 	EndProjectSection
 EndProject

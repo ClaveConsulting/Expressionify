@@ -1,13 +1,39 @@
-name: Pull-request changelog
+name: Check Pull-request
 
 on: pull_request_target
 
 jobs:
-  changelog:
-    runs-on: ubuntu-latest
-    needs: check
+  test:
+    runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration release
+
+      - name: Test
+        run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test-results
+        uses: actions/upload-artifact@v2
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: '**/test-results.trx'
+
+  version:
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    runs-on: windows-latest
+    steps:
       # Checkout all commits, so we get previous tags
       # The ref and repository is needed since we use on: pull_request_target
       - uses: actions/checkout@v2
@@ -15,19 +41,41 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
-      
+
       - uses: actions/setup-node@v1
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      
+
       # Generate changelog
       - name: Get the changelog
         id: changelog
         run: npx -q git-conventional-commits changelog --file 'temp_changelog.md'
-        
-      # Create a comment in the pull request using the changelog
+
+      - name: Output changelog
+        id: version
+        run: |
+          echo 'version<<EOF' >> $GITHUB_OUTPUT
+          type temp_changelog.md >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+  comment:
+    runs-on: ubuntu-latest
+    needs: version
+    steps:
+      # Create a comment in the pull request using the tags created
       - uses: marocchino/sticky-pull-request-comment@v1
+        if: needs.version.outputs.version != ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          path: temp_changelog.md
+          message: |
+            The following versions will be created when this pull-request is merged:
+            ```
+            ${{ needs.version.outputs.version }}
+            ```
+      - uses: marocchino/sticky-pull-request-comment@v1
+        if: needs.version.outputs.version == ''
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            No packages will be created when this pull-request is merged
