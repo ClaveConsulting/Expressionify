@@ -12,7 +12,7 @@ namespace Clave.Expressionify.Generator.Internals
         public static TypeDeclarationSyntax WithOnlyTheseMembers(this TypeDeclarationSyntax type, IEnumerable<MemberDeclarationSyntax> members)
             => TypeDeclaration(type.Kind(), type.Identifier)
                 .WithModifiers(type.Modifiers)
-                .WithAttributeLists(type.AttributeLists)
+                .WithTypeParameterList(type.TypeParameterList)
                 .AddMembers(members.ToArray());
 
         public static SyntaxNode WithOnlyTheseTypes(this SyntaxNode root, IEnumerable<MemberDeclarationSyntax> members)
