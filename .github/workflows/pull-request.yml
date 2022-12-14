@@ -3,37 +3,11 @@ name: Check Pull-request
 on: pull_request_target
 
 jobs:
-  test:
-    name: Run unit tests
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore --configuration release
-
-      - name: Test
-        run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
-
-      - name: Upload test-results
-        uses: actions/upload-artifact@v2
-        if: success() || failure()        # run this step even if previous step failed
-        with:
-          name: test-results
-          path: '**/test-results.trx'
-
   version:
     name: Get version
     outputs:
       version: ${{ steps.version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
     runs-on: ubuntu-latest
     steps:
       # Checkout all commits, so we get previous tags
@@ -49,17 +23,58 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Get version
+        id: version
+        run: echo "version=$(npx -q git-conventional-commits version)-${{ github.event.pull_request.head.ref }}.${{ github.run_number }}" >> $GITHUB_OUTPUT
+
       # Generate changelog
       - name: Get the changelog
-        id: changelog
+        id: conventional-commits
         run: npx -q git-conventional-commits changelog --file 'temp_changelog.md'
 
       - name: Output changelog
-        id: version
+        id: changelog
         run: |
-          echo 'version<<EOF' >> $GITHUB_OUTPUT
+          echo 'changelog<<EOF' >> $GITHUB_OUTPUT
           cat temp_changelog.md >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
+
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    needs: version
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration release -p:Version=${{ needs.version.outputs.version }}
+
+      - name: Test
+        run: dotnet test --no-build --configuration release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Pack
+        run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ needs.version.outputs.version }} --output ./nugets
+
+      - name: Upload test-results
+        uses: actions/upload-artifact@v2
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: '**/test-results.trx'
+
+      - name: Upload package
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: '**/*.nupkg'
 
   comment:
     name: Comment on pull-request
@@ -68,15 +83,15 @@ jobs:
     steps:
       # Create a comment in the pull request using the tags created
       - uses: marocchino/sticky-pull-request-comment@v1
-        if: needs.version.outputs.version != ''
+        if: needs.version.outputs.changelog != ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
             The following versions will be created when this pull-request is merged:
-            ${{ needs.version.outputs.version }}
+            ${{ needs.version.outputs.changelog }}
 
       - uses: marocchino/sticky-pull-request-comment@v1
-        if: needs.version.outputs.version == ''
+        if: needs.version.outputs.changelog == ''
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |

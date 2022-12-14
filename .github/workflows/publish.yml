@@ -25,9 +25,9 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Conventional Commit Action
-        id: conventional-commits
-        run: echo "::set-output name=version::$(npx -q git-conventional-commits version)"
+      - name: Get version
+        id: version
+        run: echo "version=$(npx -q git-conventional-commits version)" >> $GITHUB_OUTPUT
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
@@ -39,7 +39,7 @@ jobs:
 
       - name: Build
         env:
-          VERSION: ${{ steps.conventional-commits.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: dotnet build --no-restore --configuration release -p:Version=${{ env.VERSION }}
 
       - name: Test
@@ -59,7 +59,7 @@ jobs:
 
       - name: Pack
         env:
-          VERSION: ${{ steps.conventional-commits.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ env.VERSION }} --output ./nugets
 
       - name: Push
@@ -67,7 +67,7 @@ jobs:
 
       - name: Tag
         env:
-          VERSION: ${{ steps.conventional-commits.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           git commit -am "Created release v${{ env.VERSION }}"
           git tag "v${{ env.VERSION }}"
