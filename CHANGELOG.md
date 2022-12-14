@@ -1,3 +1,7 @@
+## **6.6.2** <sub><sup>2022-12-14 ([174ff0d...753ab7a](https://github.com/ClaveConsulting/Expressionify/compare/174ff0d...753ab7a?diff=split))</sup></sub>
+
+*no relevant changes*
+
 ## **6.6.1** <sub><sup>2022-12-12 ([6ae459e...2f5c15f](https://github.com/ClaveConsulting/Expressionify/compare/6ae459e...2f5c15f?diff=split))</sup></sub>
 
 ### Bug Fixes
