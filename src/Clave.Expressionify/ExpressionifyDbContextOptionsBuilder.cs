@@ -1,8 +1,7 @@
-﻿using System;
+﻿namespace Clave.Expressionify;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-
-namespace Clave.Expressionify;
 
 public class ExpressionifyDbContextOptionsBuilder
 {

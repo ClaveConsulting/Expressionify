@@ -1,3 +1,4 @@
+namespace Clave.Expressionify;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -5,107 +6,104 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Clave.Expressionify
+public class ExpressionifyVisitor : ExpressionVisitor
 {
-    public class ExpressionifyVisitor : ExpressionVisitor
+    private static readonly IDictionary<MethodInfo, LambdaExpression?> MethodToExpressionMap = new ConcurrentDictionary<MethodInfo, LambdaExpression?>();
+
+    private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
+
+    internal bool HasReplacedCalls { get; private set; }
+
+    protected override Expression VisitMethodCall(MethodCallExpression node)
     {
-        private static readonly IDictionary<MethodInfo, LambdaExpression?> MethodToExpressionMap = new ConcurrentDictionary<MethodInfo, LambdaExpression?>();
-
-        private readonly Dictionary<ParameterExpression, Expression> _replacements = new Dictionary<ParameterExpression, Expression>();
-
-        internal bool HasReplacedCalls { get; private set; }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
+        if (GetMethodExpression(node.Method) is LambdaExpression expression)
         {
-            if (GetMethodExpression(node.Method) is LambdaExpression expression)
-            {
-                HasReplacedCalls = true;
-                RegisterReplacementParameters(node.Arguments, expression);
-                var result = Visit(expression.Body);
-                UnregisterReplacementParameters(expression);
-                return result;
-            }
-
-            return base.VisitMethodCall(node);
+            HasReplacedCalls = true;
+            RegisterReplacementParameters(node.Arguments, expression);
+            var result = Visit(expression.Body);
+            UnregisterReplacementParameters(expression);
+            return result;
         }
 
-        private static object? GetMethodExpression(MethodInfo method)
+        return base.VisitMethodCall(node);
+    }
+
+    private static object? GetMethodExpression(MethodInfo method)
+    {
+        if (MethodToExpressionMap.TryGetValue(method, out var result))
         {
-            if (MethodToExpressionMap.TryGetValue(method, out var result))
-            {
-                return result;
-            }
-
-            if (!method.IsStatic)
-            {
-                return MethodToExpressionMap[method] = null;
-            }
-
-            var shouldUseExpression = method.GetCustomAttributes(typeof(ExpressionifyAttribute), false).Any();
-            if (!shouldUseExpression)
-            {
-                return MethodToExpressionMap[method] = null;
-            }
-
-            var declaringType = method.DeclaringType!;
-
-            if (declaringType.IsGenericType)
-            {
-                declaringType = declaringType
-                    .GetGenericTypeDefinition()
-                    .MakeGenericType(declaringType.GenericTypeArguments);
-            }
-
-            var methods = declaringType.GetRuntimeMethods();
-
-            var expression = methods
-                ?.Where(m => m.Name.StartsWith($"{method.Name}_Expressionify_"))
-                .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(method.GetGenericArguments()) : m)
-                .FirstOrDefault(m => m.MatchesTypeOf(method))
-                ?.Invoke(null, Array.Empty<object>());
-
-            if (expression is LambdaExpression lambdaExpression)
-            {
-                return MethodToExpressionMap[method] = lambdaExpression;
-            }
-
-            throw new Exception($"Code generation seems to have failed, could not find expresion for method {GetFullName(method.DeclaringType)}.{method.Name}()");
+            return result;
         }
 
-        private static string GetFullName(Type? type)
+        if (!method.IsStatic)
         {
-            if(type?.DeclaringType is Type parent)
-            {
-                return GetFullName(parent) + "." + type.Name;
-            }
-
-            return type?.Name ?? "???";
+            return MethodToExpressionMap[method] = null;
         }
 
-        protected override Expression VisitParameter(ParameterExpression node)
+        var shouldUseExpression = method.GetCustomAttributes(typeof(ExpressionifyAttribute), false).Any();
+        if (!shouldUseExpression)
         {
-            return _replacements.TryGetValue(node, out var replacement)
-                ? Visit(replacement) :
-                base.VisitParameter(node);
+            return MethodToExpressionMap[method] = null;
         }
 
-        private void RegisterReplacementParameters(IReadOnlyCollection<Expression> parameterValues, LambdaExpression expressionToVisit)
-        {
-            if (parameterValues.Count != expressionToVisit.Parameters.Count)
-                throw new ArgumentException($"The parameter values count ({parameterValues.Count}) does not match the expression parameter count ({expressionToVisit.Parameters.Count})");
+        var declaringType = method.DeclaringType!;
 
-            foreach (var (p, v) in expressionToVisit.Parameters.Zip(parameterValues, ValueTuple.Create))
-            {
-                _replacements.Add(p, v);
-            }
+        if (declaringType.IsGenericType)
+        {
+            declaringType = declaringType
+                .GetGenericTypeDefinition()
+                .MakeGenericType(declaringType.GenericTypeArguments);
         }
 
-        private void UnregisterReplacementParameters(LambdaExpression expressionToVisit)
+        var methods = declaringType.GetRuntimeMethods();
+
+        var expression = methods
+            ?.Where(m => m.Name.StartsWith($"{method.Name}_Expressionify_"))
+            .Select(m => m.IsGenericMethod ? m.MakeGenericMethod(method.GetGenericArguments()) : m)
+            .FirstOrDefault(m => m.MatchesTypeOf(method))
+            ?.Invoke(null, Array.Empty<object>());
+
+        if (expression is LambdaExpression lambdaExpression)
         {
-            foreach (var p in expressionToVisit.Parameters)
-            {
-                _replacements.Remove(p);
-            }
+            return MethodToExpressionMap[method] = lambdaExpression;
+        }
+
+        throw new Exception($"Code generation seems to have failed, could not find expresion for method {GetFullName(method.DeclaringType)}.{method.Name}()");
+    }
+
+    private static string GetFullName(Type? type)
+    {
+        if(type?.DeclaringType is Type parent)
+        {
+            return GetFullName(parent) + "." + type.Name;
+        }
+
+        return type?.Name ?? "???";
+    }
+
+    protected override Expression VisitParameter(ParameterExpression node)
+    {
+        return _replacements.TryGetValue(node, out var replacement)
+            ? Visit(replacement) :
+            base.VisitParameter(node);
+    }
+
+    private void RegisterReplacementParameters(IReadOnlyCollection<Expression> parameterValues, LambdaExpression expressionToVisit)
+    {
+        if (parameterValues.Count != expressionToVisit.Parameters.Count)
+            throw new ArgumentException($"The parameter values count ({parameterValues.Count}) does not match the expression parameter count ({expressionToVisit.Parameters.Count})");
+
+        foreach (var (p, v) in expressionToVisit.Parameters.Zip(parameterValues, ValueTuple.Create))
+        {
+            _replacements.Add(p, v);
+        }
+    }
+
+    private void UnregisterReplacementParameters(LambdaExpression expressionToVisit)
+    {
+        foreach (var p in expressionToVisit.Parameters)
+        {
+            _replacements.Remove(p);
         }
     }
 }

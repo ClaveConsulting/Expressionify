@@ -1,8 +1,7 @@
-﻿namespace Clave.Expressionify.Tests.Samples
+﻿namespace Clave.Expressionify.Tests.Samples;
+
+public static partial class Class1
 {
-    public static partial class Class1
-    {
-        [Expressionify]
-        public static int Foo(int x) => 8;
-    }
+    [Expressionify]
+    public static int Foo(int x) => 8;
 }

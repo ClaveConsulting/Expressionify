@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-
-namespace Clave.Expressionify;
+﻿namespace Clave.Expressionify;
+using Microsoft.EntityFrameworkCore.Query;
 
 public class ExpressionifyQueryTranslationPreprocessorFactory : IQueryTranslationPreprocessorFactory
 {

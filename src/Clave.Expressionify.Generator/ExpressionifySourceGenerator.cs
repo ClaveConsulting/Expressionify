@@ -1,3 +1,4 @@
+namespace Clave.Expressionify.Generator;
 using System;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,95 +10,92 @@ using Clave.Expressionify.Generator.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using System.IO;
 
-namespace Clave.Expressionify.Generator
+[Generator]
+public class ExpressionifySourceGenerator : ISourceGenerator
 {
-    [Generator]
-    public class ExpressionifySourceGenerator : ISourceGenerator
+    private static readonly string NullableDirective = "#nullable enable\r\n\r\n";
+
+    public void Initialize(GeneratorInitializationContext context)
     {
-        private static readonly string NullableDirective = "#nullable enable\r\n\r\n";
+        context.RegisterForSyntaxNotifications(() => new ExpressionifySyntaxReceiver());
+    }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            context.RegisterForSyntaxNotifications(() => new ExpressionifySyntaxReceiver());
-        }
+    public void Execute(GeneratorExecutionContext context)
+    {
+        if (context.SyntaxReceiver is ExpressionifySyntaxReceiver syntaxReceiver)
+            Execute(context, syntaxReceiver.Methods);
+    }
 
-        public void Execute(GeneratorExecutionContext context)
-        {
-            if (context.SyntaxReceiver is ExpressionifySyntaxReceiver syntaxReceiver)
-                Execute(context, syntaxReceiver.Methods);
-        }
+    private record Expressioned(
+        MethodDeclarationSyntax Original,
+        MethodDeclarationSyntax Replaced,
+        (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
+    {
+        public static Expressioned Create(MethodDeclarationSyntax m) => new(
+            m,
+            m.ToExpressionMethod(),
+            m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
+    }
 
-        private record Expressioned(
-            MethodDeclarationSyntax Original,
-            MethodDeclarationSyntax Replaced,
-            (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
+    private static void Execute(GeneratorExecutionContext context, IEnumerable<MethodDeclarationSyntax> methods)
+    {
+        try
         {
-            public static Expressioned Create(MethodDeclarationSyntax m) => new(
-                m,
-                m.ToExpressionMethod(),
-                m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
-        }
+            var i = 0;
 
-        private static void Execute(GeneratorExecutionContext context, IEnumerable<MethodDeclarationSyntax> methods)
-        {
-            try
+            static MemberDeclarationSyntax[] Group(IEnumerable<Expressioned> methods) =>
+                methods
+                    .GroupBy(x => x.Path?.Head, x => x with { Path = x.Path?.Tail.HeadAndTail() })
+                    .Select(g => g.Key!.WithOnlyTheseMembers(g
+                        .Where(x => x.Path is null)
+                        .Select(x => x.Replaced)
+                        .GroupBy(p => p.Identifier.Text)
+                        .SelectMany(x => x.Select((y, i) => y.GeneratedName(i)))
+                        .Concat(Group(g.Where(x => x.Path is not null)))))
+                    .ToArray();
+
+            var replacedTypes = methods
+                .Select(Expressioned.Create)
+                .GroupBy(m => m.Original.SyntaxTree.GetRoot(), (root, x) => (root.SyntaxTree.FilePath, root.WithOnlyTheseTypes(Group(x))));
+
+            foreach (var (path, source) in replacedTypes)
             {
-                var i = 0;
+                var sourceCode = NullableDirective + source.ToFullString();
 
-                static MemberDeclarationSyntax[] Group(IEnumerable<Expressioned> methods) =>
-                    methods
-                        .GroupBy(x => x.Path?.Head, x => x with { Path = x.Path?.Tail.HeadAndTail() })
-                        .Select(g => g.Key!.WithOnlyTheseMembers(g
-                            .Where(x => x.Path is null)
-                            .Select(x => x.Replaced)
-                            .GroupBy(p => p.Identifier.Text)
-                            .SelectMany(x => x.Select((y, i) => y.GeneratedName(i)))
-                            .Concat(Group(g.Where(x => x.Path is not null)))))
-                        .ToArray();
-
-                var replacedTypes = methods
-                    .Select(Expressioned.Create)
-                    .GroupBy(m => m.Original.SyntaxTree.GetRoot(), (root, x) => (root.SyntaxTree.FilePath, root.WithOnlyTheseTypes(Group(x))));
-
-                foreach (var (path, source) in replacedTypes)
-                {
-                    var sourceCode = NullableDirective + source.ToFullString();
-
-                    context.AddSource(
-                        Path.GetFileNameWithoutExtension(path) + $"_expressionify_{i++}.g.cs",
-                        SourceText.From(sourceCode, Encoding.UTF8));
-                }
-            }
-            catch (Exception e)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor("EXPR001", "Error generating expression", $"{e.Message}\n{e.StackTrace}", "error",
-                        DiagnosticSeverity.Error, true, e.StackTrace), Location.None));
+                context.AddSource(
+                    Path.GetFileNameWithoutExtension(path) + $"_expressionify_{i++}.g.cs",
+                    SourceText.From(sourceCode, Encoding.UTF8));
             }
         }
-
-        private class ExpressionifySyntaxReceiver : ISyntaxReceiver
+        catch (Exception e)
         {
-            public readonly HashSet<TypeDeclarationSyntax> Types = new HashSet<TypeDeclarationSyntax>();
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor("EXPR001", "Error generating expression", $"{e.Message}\n{e.StackTrace}", "error",
+                    DiagnosticSeverity.Error, true, e.StackTrace), Location.None));
+        }
+    }
 
-            public readonly HashSet<MethodDeclarationSyntax> Methods = new HashSet<MethodDeclarationSyntax>();
+    private class ExpressionifySyntaxReceiver : ISyntaxReceiver
+    {
+        public readonly HashSet<TypeDeclarationSyntax> Types = new HashSet<TypeDeclarationSyntax>();
 
-            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        public readonly HashSet<MethodDeclarationSyntax> Methods = new HashSet<MethodDeclarationSyntax>();
+
+        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        {
+            if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
             {
-                if (syntaxNode is MethodDeclarationSyntax methodDeclaration)
+                if (!methodDeclaration.HasExpressionBody()) return;
+                if (!methodDeclaration.HasExpressionifyAttribute()) return;
+                if (!methodDeclaration.IsStatic()) return;
+
+                if (methodDeclaration.Ancestors().OfType<TypeDeclarationSyntax>().LastOrDefault() is { } type)
                 {
-                    if (!methodDeclaration.HasExpressionBody()) return;
-                    if (!methodDeclaration.HasExpressionifyAttribute()) return;
-                    if (!methodDeclaration.IsStatic()) return;
+                    if (!type.Modifiers.Includes(SyntaxKind.PartialKeyword)) return;
 
-                    if (methodDeclaration.Ancestors().OfType<TypeDeclarationSyntax>().LastOrDefault() is { } type)
-                    {
-                        if (!type.Modifiers.Includes(SyntaxKind.PartialKeyword)) return;
+                    Methods.Add(methodDeclaration);
 
-                        Methods.Add(methodDeclaration);
-
-                        Types.Add(type);
-                    }
+                    Types.Add(type);
                 }
             }
         }
