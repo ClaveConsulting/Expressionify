@@ -25,7 +25,9 @@ jobs:
 
       - name: Get version
         id: version
-        run: echo "version=$(npx -q git-conventional-commits version)-${{ github.event.pull_request.head.ref }}.${{ github.run_number }}" >> $GITHUB_OUTPUT
+        env:
+          PR_REF: ${{ github.event.pull_request.head.ref }}
+        run: echo "version=$(npx -q git-conventional-commits version)-${PR_REF}.${{ github.run_number }}" >> $GITHUB_OUTPUT
 
       # Generate changelog
       - name: Get the changelog
