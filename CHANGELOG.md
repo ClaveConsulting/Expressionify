@@ -1,3 +1,8 @@
+## **6.6.3**&emsp;<sub><sup>2023-07-16 ([4c34cb9...4c34cb9](https://github.com/ClaveConsulting/Expressionify/compare/4c34cb964e517ec5609cc820d969011c7359c447...4c34cb964e517ec5609cc820d969011c7359c447?diff=split))</sup></sub>
+
+*no relevant changes*
+<br>
+
 ## **6.6.2** <sub><sup>2022-12-14 ([174ff0d...753ab7a](https://github.com/ClaveConsulting/Expressionify/compare/174ff0d...753ab7a?diff=split))</sup></sub>
 
 *no relevant changes*
