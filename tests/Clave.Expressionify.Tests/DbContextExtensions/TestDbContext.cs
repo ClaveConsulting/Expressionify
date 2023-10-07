@@ -1,12 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿namespace Clave.Expressionify.Tests.DbContextExtensions;
+using Microsoft.EntityFrameworkCore;
 
-namespace Clave.Expressionify.Tests.DbContextExtensions
+public class TestDbContext : DbContext
 {
-    public class TestDbContext : DbContext
-    {
-        public TestDbContext(DbContextOptions options) : base(options)
-        { }
+    public TestDbContext(DbContextOptions options) : base(options)
+    { }
 
-        public DbSet<TestEntity> TestEntities { get; set; } = null!;
-    }
+    public DbSet<TestEntity> TestEntities { get; set; } = null!;
 }

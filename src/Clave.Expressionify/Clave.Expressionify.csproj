@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <DebugType>embedded</DebugType>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -20,5 +20,4 @@
         <Description>Use extension methods in Entity Framework Core queries</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
-
 </Project>

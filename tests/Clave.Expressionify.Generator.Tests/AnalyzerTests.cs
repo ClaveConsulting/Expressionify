@@ -1,32 +1,31 @@
-﻿using System.Threading.Tasks;
+﻿namespace Clave.Expressionify.Generator.Tests;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using Verify = Microsoft.CodeAnalysis.CSharp.Testing.NUnit.AnalyzerVerifier<Clave.Expressionify.Generator.ExpressionifyAnalyzer>;
+using Verify = Microsoft.CodeAnalysis.CSharp.Testing.NUnit.AnalyzerVerifier<ExpressionifyAnalyzer>;
 
-namespace Clave.Expressionify.Generator.Tests
+public class AnalyzerTests
 {
-    public class AnalyzerTests
+    [Test]
+    public async Task TestNullPropagationMethod()
     {
-        [Test]
-        public async Task TestNullPropagationMethod()
-        {
-            var test = @"
-                namespace ConsoleApplication1
+        var test = """
+            namespace ConsoleApplication1
+            {
+                public partial class Extensions
                 {
-                    public partial class Extensions
-                    {
-                        [Expressionify]
-                        public static int? GetYear(System.DateTime? x) => x?.Year;
-                    }
-                    
-                    [System.AttributeUsage(System.AttributeTargets.Method)]
-                    public class ExpressionifyAttribute : System.Attribute {}
-                }";
+                    [Expressionify]
+                    public static int? GetYear(System.DateTime? x) => x?.Year;
+                }
 
-            var expected = Verify.Diagnostic(ExpressionifyAnalyzer.NullPropagationRule)
-                .WithSpan("/0/Test0.cs", 7, 75, 7, 82)
-                .WithArguments("GetYear");
+                [System.AttributeUsage(System.AttributeTargets.Method)]
+                public class ExpressionifyAttribute : System.Attribute {}
+            }
+            """;
 
-            await Verify.VerifyAnalyzerAsync(test, expected);
-        }
+        var expected = Verify.Diagnostic(ExpressionifyAnalyzer.NullPropagationRule)
+            .WithSpan("/0/Test0.cs", 6, 59, 6, 66)
+            .WithArguments("GetYear");
+
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 }
