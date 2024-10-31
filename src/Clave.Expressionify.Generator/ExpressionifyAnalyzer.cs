@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
 using Clave.Expressionify.Generator.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,7 +13,6 @@ namespace Clave.Expressionify.Generator
         public const string StaticId = "EXPR001";
         public const string ExpressionBodyId = "EXPR002";
         public const string PartialClassId = "EXPR003";
-        public const string NullPropagationId = "EXPR004";
 
         public static readonly DiagnosticDescriptor StaticRule = new DiagnosticDescriptor(
             id: StaticId,
@@ -40,19 +38,10 @@ namespace Clave.Expressionify.Generator
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
-        public static readonly DiagnosticDescriptor NullPropagationRule = new DiagnosticDescriptor(
-            id: NullPropagationId,
-            title: "An expressionify method may not contain a null propagating operator",
-            messageFormat: "Method {0} marked with [Expressionify] may not contain null propagation operator",
-            category: "Syntax",
-            defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
-
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
             StaticRule,
             ExpressionBodyRule,
-            PartialClassRule,
-            NullPropagationRule);
+            PartialClassRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -88,14 +77,6 @@ namespace Clave.Expressionify.Generator
                 context.ReportDiagnostic(Diagnostic.Create(
                     PartialClassRule,
                     typeNode.GetLocation()));
-            }
-
-            if (methodDeclaration.FindNullPropagationNode() is SyntaxNode memberNode)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    NullPropagationRule,
-                    memberNode.GetLocation(),
-                    methodDeclaration.Identifier.ToString()));
             }
         }
     }

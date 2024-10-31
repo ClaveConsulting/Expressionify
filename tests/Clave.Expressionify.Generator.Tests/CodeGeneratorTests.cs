@@ -182,6 +182,47 @@ namespace ConsoleApplication1
         private static System.Linq.Expressions.Expression<System.Func<T, string>> Foo_Expressionify_0() => (T x) => ""bar"";
     }
 }", TestName = "Generic type")]
+
+        // Null propagation
+        [TestCase(@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    using System;
+
+    public partial class Extensions
+    {
+        [Expressionify]
+        public static int? GetYear(System.DateTime? x) => x?.Year;
+
+        [Expressionify]
+        public static string? GetYearString(System.DateTime? x) => (x?.AddDays(1).Year)?.ToString();
+
+        [Expressionify]
+        public static byte? First(byte[]? x) => x?[0];
+
+        [Expressionify]
+        public static string? FirstString(byte[]? x) => x?[0].ToString();
+
+        [Expressionify]
+        public static int? FirstYear(DateTime?[]? x) => x?[0]?.Year;
+    }
+}",
+@"#nullable enable
+
+namespace ConsoleApplication1
+{
+    using System;
+
+    public partial class Extensions
+    {
+        private static System.Linq.Expressions.Expression<System.Func<System.DateTime?, int?>> GetYear_Expressionify_0() => (System.DateTime? x) => x!.Value.Year;
+        private static System.Linq.Expressions.Expression<System.Func<System.DateTime?, string?>> GetYearString_Expressionify_0() => (System.DateTime? x) => (x!.Value.AddDays(1).Year)!.ToString();
+        private static System.Linq.Expressions.Expression<System.Func<byte[]?, byte?>> First_Expressionify_0() => (byte[]? x) => x![0];
+        private static System.Linq.Expressions.Expression<System.Func<byte[]?, string?>> FirstString_Expressionify_0() => (byte[]? x) => x![0].ToString();
+        private static System.Linq.Expressions.Expression<System.Func<DateTime? []?, int?>> FirstYear_Expressionify_0() => (DateTime? []? x) => x![0]!.Value.Year;
+    }
+}", TestName = "Null propagation")]
         public async Task TestGenerator(string source, string generated)
         {
             await VerifyGenerated(source, generated);

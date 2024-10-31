@@ -11,20 +11,28 @@ namespace Clave.Expressionify.Generator.Internals
         public static MethodDeclarationSyntax GeneratedName(this MethodDeclarationSyntax p, int i)
             => p.WithIdentifier(Identifier($"{p.Identifier.Text}_Expressionify_{i}"));
 
-        public static MethodDeclarationSyntax ToExpressionMethod(this MethodDeclarationSyntax method)
+        public static MethodDeclarationSyntax ToExpressionMethod(
+            this MethodDeclarationSyntax method,
+            Compilation compilation)
             => MethodDeclaration(GetExpressionType(method), method.Identifier)
                 .WithModifiers(TokenList(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword)))
                 .WithTypeParameterList(method.TypeParameterList)
                 .WithConstraintClauses(method.ConstraintClauses)
-                .WithExpressionBody(ArrowExpressionClause(GetBody(method)))
+                .WithExpressionBody(ArrowExpressionClause(GetBody(method, compilation)))
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
                 .NormalizeWhitespace();
 
-        private static ParenthesizedLambdaExpressionSyntax GetBody(BaseMethodDeclarationSyntax method)
-            => ParenthesizedLambdaExpression(
-                    ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList())))),
-                    method.ExpressionBody!.Expression
-                );
+        private static ParenthesizedLambdaExpressionSyntax GetBody(
+            BaseMethodDeclarationSyntax method,
+            Compilation compilation)
+        {
+            var expressionRewriter = new ExpressionRewriter(compilation, method.SyntaxTree.GetRoot());
+            
+            return ParenthesizedLambdaExpression(
+                ParameterList(SeparatedList(method.ParameterList.Parameters.Select(p => p.WithModifiers(TokenList())))),
+                expressionRewriter.VisitExpression(method.ExpressionBody!.Expression)
+            );
+        }
 
         private static QualifiedNameSyntax GetExpressionType(MethodDeclarationSyntax method) =>
             Expression(Func(

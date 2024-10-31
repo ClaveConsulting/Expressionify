@@ -21,8 +21,5 @@ namespace Clave.Expressionify.Generator.Internals
 
         public static TypeDeclarationSyntax? FindAncestorMissingPartialKeyword(this MethodDeclarationSyntax method) =>
             method.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault(t => !t.Modifiers.Includes(SyntaxKind.PartialKeyword));
-
-        public static SyntaxNode? FindNullPropagationNode(this MethodDeclarationSyntax method) =>
-            method.DescendantNodes().OfType<ConditionalAccessExpressionSyntax>().FirstOrDefault();
     }
 }
