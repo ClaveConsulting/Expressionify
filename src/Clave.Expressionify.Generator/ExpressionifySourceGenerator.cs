@@ -32,9 +32,9 @@ namespace Clave.Expressionify.Generator
             MethodDeclarationSyntax Replaced,
             (TypeDeclarationSyntax? Head, IEnumerator<TypeDeclarationSyntax> Tail)? Path)
         {
-            public static Expressioned Create(MethodDeclarationSyntax m) => new(
+            public static Expressioned Create(MethodDeclarationSyntax m, Compilation compilation) => new(
                 m,
-                m.ToExpressionMethod(),
+                m.ToExpressionMethod(compilation),
                 m.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().HeadAndTail());
         }
 
@@ -56,7 +56,7 @@ namespace Clave.Expressionify.Generator
                         .ToArray();
 
                 var replacedTypes = methods
-                    .Select(Expressioned.Create)
+                    .Select(x => Expressioned.Create(x, context.Compilation))
                     .GroupBy(m => m.Original.SyntaxTree.GetRoot(), (root, x) => (root.SyntaxTree.FilePath, root.WithOnlyTheseTypes(Group(x))));
 
                 foreach (var (path, source) in replacedTypes)
