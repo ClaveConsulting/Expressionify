@@ -1,3 +1,12 @@
+## **6.7.0**&emsp;<sub><sup>2022-12-14 ([50641f0...3fae05d](https://github.com/ClaveConsulting/Expressionify/compare/50641f0924d179f8c6cceb0ab1c1eea473ac9428...3fae05d19585f2ffa7b23d533c4ab16d98a61f10?diff=split))</sup></sub>
+
+### Features
+
+- Implemented generic methods ([50641f0](https://github.com/ClaveConsulting/Expressionify/commit/50641f0924d179f8c6cceb0ab1c1eea473ac9428))
+- Generic classes can contain expressionify methods ([3fae05d](https://github.com/ClaveConsulting/Expressionify/commit/3fae05d19585f2ffa7b23d533c4ab16d98a61f10))
+
+<br>
+
 ## **6.6.4**&emsp;<sub><sup>2024-11-11 ([2658a0f...2658a0f](https://github.com/ClaveConsulting/Expressionify/compare/2658a0f86c3062e60e2391e43e25fcd690bbfe4f...2658a0f86c3062e60e2391e43e25fcd690bbfe4f?diff=split))</sup></sub>
 
 *no relevant changes*
