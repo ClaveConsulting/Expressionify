@@ -10,7 +10,7 @@ jobs:
 
     steps:
       # Checkout all commits, so we get previous tags
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -20,9 +20,9 @@ jobs:
           git config --local user.name "ci-bot"
           git config --local user.email "github@clave.no"
 
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Get version
@@ -30,7 +30,7 @@ jobs:
         run: echo "version=$(npx -q git-conventional-commits version)" >> $GITHUB_OUTPUT
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 

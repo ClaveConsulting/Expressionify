@@ -12,15 +12,15 @@ jobs:
     steps:
       # Checkout all commits, so we get previous tags
       # The ref and repository is needed since we use on: pull_request_target
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
 
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Get version
@@ -46,10 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: version
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
@@ -66,14 +66,14 @@ jobs:
         run: dotnet pack --no-build --include-symbols --configuration release -p:PackageVersion=${{ needs.version.outputs.version }} --output ./nugets
 
       - name: Upload test-results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results
           path: '**/test-results.trx'
 
       - name: Upload package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: package
           path: '**/*.nupkg'
@@ -109,7 +109,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: package
           path: './nuget'
