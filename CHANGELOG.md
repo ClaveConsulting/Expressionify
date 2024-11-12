@@ -1,3 +1,8 @@
+## **6.7.1**&emsp;<sub><sup>2024-10-31 ([ad5c447...ddc49b2](https://github.com/ClaveConsulting/Expressionify/compare/ad5c4470f9eb8bc91284c556f719f01b6d0dab49...ddc49b22ebb0feeb77c6c4c7b460117a4a33ef74?diff=split))</sup></sub>
+
+*no relevant changes*
+<br>
+
 ## **6.7.0**&emsp;<sub><sup>2022-12-14 ([50641f0...3fae05d](https://github.com/ClaveConsulting/Expressionify/compare/50641f0924d179f8c6cceb0ab1c1eea473ac9428...3fae05d19585f2ffa7b23d533c4ab16d98a61f10?diff=split))</sup></sub>
 
 ### Features
