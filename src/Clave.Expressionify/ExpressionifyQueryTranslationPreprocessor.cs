@@ -35,16 +35,14 @@ namespace Clave.Expressionify
         {
             // 1) Ensure that no new parameters are introduced when creating the query
             // 2) This expression visitor also makes slight optimzations, like replacing evaluatable expressions.
-            var visitor = new ParameterExtractingExpressionVisitor(
-                Dependencies.EvaluatableExpressionFilter,
-                new ThrowOnParameterAccess(),
-                QueryCompilationContext.ContextType,
+            ExpressionTreeFuncletizer funcletizer = new(
                 QueryCompilationContext.Model,
-                QueryCompilationContext.Logger,
-                parameterize: true,
-                generateContextAccessors: false);
+                Dependencies.EvaluatableExpressionFilter,
+                QueryCompilationContext.ContextType,
+                generateContextAccessors: false,
+                QueryCompilationContext.Logger);
 
-            return visitor.ExtractParameters(query);
+            return funcletizer.ExtractParameters(query, new ThrowOnParameterAccess(), parameterize: true, clearParameterizedValues: true);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>")]
