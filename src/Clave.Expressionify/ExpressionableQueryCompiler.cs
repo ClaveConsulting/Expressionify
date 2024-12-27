@@ -24,5 +24,9 @@ namespace Clave.Expressionify
         public TResult ExecuteAsync<TResult>(Expression query, CancellationToken cancellationToken) => _decoratedCompiler.ExecuteAsync<TResult>(Visit(query), cancellationToken);
 
         private static Expression Visit(Expression exp) => new ExpressionifyVisitor().Visit(exp);
+
+#pragma warning disable EF9100 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        public Expression<Func<QueryContext, TResult>> PrecompileQuery<TResult>(Expression query, bool async) => _decoratedCompiler.PrecompileQuery<TResult>(query, async);
+#pragma warning restore EF9100
     }
 }
