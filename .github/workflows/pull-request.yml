@@ -48,6 +48,8 @@ jobs:
     needs: version
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
