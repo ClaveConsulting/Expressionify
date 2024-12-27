@@ -1,3 +1,15 @@
+## **9.0.0**&emsp;<sub><sup>2024-12-27 ([0a25faa...ab25144](https://github.com/ClaveConsulting/Expressionify/compare/0a25faa81d7fef929450b4548bef80c7784b7869...ab251447ae87ffcca3c4c8d9f7d0492a63dcb604?diff=split))</sup></sub>
+
+
+### BREAKING CHANGES
+-  supports EF9 ([ab25144](https://github.com/ClaveConsulting/Expressionify/commit/ab251447ae87ffcca3c4c8d9f7d0492a63dcb604))
+
+
+  \-\-\-\-\-\-\-\-\-
+  
+  Co\-authored\-by: Fabien Molinet <molinetf@medgate\.ch\>
+<br>
+
 ## **6.7.1**&emsp;<sub><sup>2024-10-31 ([ad5c447...ddc49b2](https://github.com/ClaveConsulting/Expressionify/compare/ad5c4470f9eb8bc91284c556f719f01b6d0dab49...ddc49b22ebb0feeb77c6c4c7b460117a4a33ef74?diff=split))</sup></sub>
 
 *no relevant changes*
