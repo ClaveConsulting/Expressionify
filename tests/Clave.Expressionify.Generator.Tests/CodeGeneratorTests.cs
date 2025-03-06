@@ -193,10 +193,10 @@ namespace ConsoleApplication1
     public partial class Extensions
     {
         [Expressionify]
-        public static int? GetYear(System.DateTime? x) => x?.Year;
+        public static int? GetYear(DateTime? x) => x?.Year;
 
         [Expressionify]
-        public static string? GetYearString(System.DateTime? x) => (x?.AddDays(1).Year)?.ToString();
+        public static string? GetYearString(DateTime? x) => (x?.AddDays(1).Year)?.ToString();
 
         [Expressionify]
         public static byte? First(byte[]? x) => x?[0];
@@ -206,6 +206,9 @@ namespace ConsoleApplication1
 
         [Expressionify]
         public static int? FirstYear(DateTime?[]? x) => x?[0]?.Year;
+
+        [Expressionify]
+        public static int? GetYearOfNextDay(DateTime? x) => GetYear(x?.AddDays(1));
     }
 }",
 @"#nullable enable
@@ -216,11 +219,12 @@ namespace ConsoleApplication1
 
     public partial class Extensions
     {
-        private static System.Linq.Expressions.Expression<System.Func<System.DateTime?, int?>> GetYear_Expressionify_0() => (System.DateTime? x) => x!.Value.Year;
-        private static System.Linq.Expressions.Expression<System.Func<System.DateTime?, string?>> GetYearString_Expressionify_0() => (System.DateTime? x) => (x!.Value.AddDays(1).Year)!.ToString();
+        private static System.Linq.Expressions.Expression<System.Func<DateTime?, int?>> GetYear_Expressionify_0() => (DateTime? x) => x!.Value.Year;
+        private static System.Linq.Expressions.Expression<System.Func<DateTime?, string?>> GetYearString_Expressionify_0() => (DateTime? x) => (x!.Value.AddDays(1).Year)!.ToString();
         private static System.Linq.Expressions.Expression<System.Func<byte[]?, byte?>> First_Expressionify_0() => (byte[]? x) => x![0];
         private static System.Linq.Expressions.Expression<System.Func<byte[]?, string?>> FirstString_Expressionify_0() => (byte[]? x) => x![0].ToString();
         private static System.Linq.Expressions.Expression<System.Func<DateTime? []?, int?>> FirstYear_Expressionify_0() => (DateTime? []? x) => x![0]!.Value.Year;
+        private static System.Linq.Expressions.Expression<System.Func<DateTime?, int?>> GetYearOfNextDay_Expressionify_0() => (DateTime? x) => GetYear(x!.Value.AddDays(1));
     }
 }", TestName = "Null propagation")]
         public async Task TestGenerator(string source, string generated)
