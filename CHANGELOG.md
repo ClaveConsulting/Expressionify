@@ -1,3 +1,11 @@
+## **8.1.0**&emsp;<sub><sup>2025-03-21 ([3250a8f...3250a8f](https://github.com/ClaveConsulting/Expressionify/compare/3250a8fff5fbf2699eda2760721a539b8ec6193e...3250a8fff5fbf2699eda2760721a539b8ec6193e?diff=split))</sup></sub>
+
+### Features
+
+- handle nullable propagation expression in arguments ([3250a8f](https://github.com/ClaveConsulting/Expressionify/commit/3250a8fff5fbf2699eda2760721a539b8ec6193e))
+
+<br>
+
 ## **8.0.1**&emsp;<sub><sup>2025-03-21 ([dd8ccaf...dd8ccaf](https://github.com/ClaveConsulting/Expressionify/compare/dd8ccaff49b968029188331d4651db44bfad62d3...dd8ccaff49b968029188331d4651db44bfad62d3?diff=split))</sup></sub>
 
 *no relevant changes*
