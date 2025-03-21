@@ -15,6 +15,9 @@
         public static bool IsFoo(this TestEntity2 testEntity) => testEntity.Name == "Foo";
 
         [Expressionify]
+        public static string GetFoo(this TestEntity2 testEntity) => "Foo " + testEntity.Name;
+
+        [Expressionify]
         public static bool IsSomething(this TestEntity testEntity) => testEntity.Name == Name;
 
         [Expressionify]
