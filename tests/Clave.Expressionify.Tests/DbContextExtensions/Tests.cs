@@ -188,6 +188,17 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             debugInfo["Expressionify:EvaluationMode"].ShouldBe(ExpressionEvaluationMode.LimitedCompatibilityButCached.ToString());
         }
 
+        [Test]
+        public void UseExpressionify_InFilter()
+        {
+            using var dbContext = new TestDbContext(GetOptions(o => o.WithEvaluationMode(ExpressionEvaluationMode.LimitedCompatibilityButCached)));
+            var query = dbContext.TestEntities2.Select(e => e.Name);
+
+            var sql = query.ToQueryString();
+            sql.ShouldStartWith("SELECT \"t\".\"Name\"");
+            sql.ShouldEndWith("WHERE \"t\".\"Name\" = 'Foo'");
+        }
+
         private DbContextOptions GetOptions(Action<ExpressionifyDbContextOptionsBuilder>? optionsAction = null, bool useExpressionify = true)
         {
             var builder = new DbContextOptionsBuilder<TestDbContext>().UseSqlite("DataSource=:memory:");
