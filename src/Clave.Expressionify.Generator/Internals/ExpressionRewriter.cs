@@ -3,7 +3,7 @@ namespace Clave.Expressionify.Generator.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
+using System.Linq;
 
 internal sealed class ExpressionRewriter : CSharpSyntaxRewriter
 {
@@ -28,7 +28,10 @@ internal sealed class ExpressionRewriter : CSharpSyntaxRewriter
 
         return _root
             .ReplaceNode(node, res)
-            .FindNode(new TextSpan(node.FullSpan.Start, res.FullSpan.Length));
+            .DescendantNodes()
+            .Where(x => x.FullSpan.Start == node.FullSpan.Start)
+            .Where(x => x.FullSpan.Length == res.FullSpan.Length)
+            .First(x => x.GetType() == res.GetType());
     }
 
     public override SyntaxNode? VisitConditionalAccessExpression(ConditionalAccessExpressionSyntax node)
