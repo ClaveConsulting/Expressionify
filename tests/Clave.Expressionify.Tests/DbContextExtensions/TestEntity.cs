@@ -9,6 +9,12 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
         public DateTime Created { get; set; }
     }
 
+    public class TestEntity2
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+    }
+
     public class TestAddress
     {
         public string? City { get; set; }

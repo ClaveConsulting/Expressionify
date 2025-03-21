@@ -22,12 +22,13 @@ namespace Clave.Expressionify
         public override Expression Process(Expression query)
         {
             var visitor = new ExpressionifyVisitor();
+            query = _innerPreprocessor.Process(query);
             query = visitor.Visit(query);
 
             if (visitor.HasReplacedCalls)
                query = EvaluateExpression(query);
 
-            return _innerPreprocessor.Process(query);
+            return query;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>")]
@@ -50,7 +51,7 @@ namespace Clave.Expressionify
                 generateContextAccessors: false);
 
             return visitor.ExtractParameters(query);
-            
+
             /* With EF9 something along these lines would have been the ideal solution:
             ExpressionTreeFuncletizer funcletizer = new(
                 QueryCompilationContext.Model,
