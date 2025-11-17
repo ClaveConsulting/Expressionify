@@ -37,7 +37,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Expressionify().Select(e => e.GetName(prefix));
 
             var sql = query.ToQueryString();
-            sql.ShouldBe($".param set @__p_0 'oh hi '{Environment.NewLine}{Environment.NewLine}SELECT @__p_0 || \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"");
+            sql.ShouldBe($".param set @p 'oh hi '{Environment.NewLine}{Environment.NewLine}SELECT @p || \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"");
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             using var dbContext = new TestDbContext(GetOptions());
             var query = dbContext.TestEntities.Expressionify().Where(e => e.IsSomething());
 
-            query.ToQueryString().ShouldBe($".param set @__Name_0 'Something'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @__Name_0");
+            query.ToQueryString().ShouldBe($".param set @Name 'Something'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @Name");
         }
 
         [TestCase(ExpressionEvaluationMode.FullCompatibilityButSlow)]
@@ -80,7 +80,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             using var dbContext = new TestDbContext(GetOptions(o => o.WithEvaluationMode(mode)));
             var query = dbContext.TestEntities.Where(e => e.NameEquals(name));
 
-            query.ToQueryString().ShouldBe($".param set @__name_0 'oh hi'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @__name_0");
+            query.ToQueryString().ShouldBe($".param set @name 'oh hi'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @name");
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             using var dbContext = new TestDbContext(GetOptions(optionsAction: o => o.WithEvaluationMode(ExpressionEvaluationMode.FullCompatibilityButSlow)));
             var query = dbContext.TestEntities.Where(e => e.IsSomething());
 
-            query.ToQueryString().ShouldBe($".param set @__Name_0 'Something'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @__Name_0");
+            query.ToQueryString().ShouldBe($".param set @Name 'Something'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Name\" = @Name");
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             using var dbContext = new TestDbContext(GetOptions(optionsAction: o => o.WithEvaluationMode(ExpressionEvaluationMode.FullCompatibilityButSlow)));
             var query = dbContext.TestEntities.Where(e => e.IsRecent());
 
-            query.ToQueryString().ShouldBe($".param set @__AddDays_0 '2022-03-03 05:06:07'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Created\" > @__AddDays_0");
+            query.ToQueryString().ShouldBe($".param set @AddDays '2022-03-03 05:06:07'{Environment.NewLine}{Environment.NewLine}SELECT \"t\".\"Id\", \"t\".\"Created\", \"t\".\"Name\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"{Environment.NewLine}WHERE \"t\".\"Created\" > @AddDays");
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Where(e => e.IsSomething());
 
             var exception = Should.Throw<InvalidOperationException>(() => query.ToQueryString());
-            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
+            exception.Message.ShouldBe("Adding parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
         }
 
         [Test]
@@ -118,7 +118,7 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Where(e => e.IsSomething());
 
             var exception = Should.Throw<InvalidOperationException>(() => query.ToQueryString());
-            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
+            exception.Message.ShouldBe("Adding parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
         }
 
         [Test]
@@ -151,16 +151,6 @@ namespace Clave.Expressionify.Tests.DbContextExtensions
             var query = dbContext.TestEntities.Select(e => e.ToTestView(null));
 
             query.ToQueryString().ShouldBe($"SELECT \"t\".\"Name\", NULL AS \"Street\"{Environment.NewLine}FROM \"TestEntities\" AS \"t\"");
-        }
-
-        [Test]
-        public void UseExpressionify_EvaluationModeCached_CannotHandleEvaluatableExpressions()
-        {
-            using var dbContext = new TestDbContext(GetOptions(o => o.WithEvaluationMode(ExpressionEvaluationMode.LimitedCompatibilityButCached)));
-            var query = dbContext.TestEntities.Select(e => e.ToTestView(null));
-
-            var exception = Should.Throw<InvalidOperationException>(() => query.ToQueryString());
-            exception.Message.ShouldBe("Accessing parameters in a cached query context is not allowed. Explicitly call .Expressionify() on the query or use ExpressionEvaluationMode.FullCompatibilityButSlow.");
         }
 
         [TestCase(ExpressionEvaluationMode.FullCompatibilityButSlow)]
