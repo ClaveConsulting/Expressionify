@@ -34,47 +34,66 @@ namespace Clave.Expressionify
         private Expression EvaluateExpression(Expression query)
         {
             // 1) Ensure that no new parameters are introduced when creating the query
-            // 2) This expression visitor also makes slight optimzations, like replacing evaluatable expressions.
+            // 2) This expression visitor also makes slight optimizations, like replacing evaluatable expressions.
 
-            // ParameterExtractingExpressionVisitor is 100% taken from EF8
-            // We should move to ExpressionTreeFuncletizer (see: https://github.com/dotnet/efcore/pull/33106/files)
-            // But the funcletizer doesn't behave the same since it would call ParameterValues.Count which would then throw (see below)
-            // Thus, for now we just reuse ParameterExtractingExpressionVisitor until a proper fix is found
-            var visitor = new ParameterExtractingExpressionVisitor(
-                Dependencies.EvaluatableExpressionFilter,
-                new ThrowOnParameterAccess(),
-                QueryCompilationContext.ContextType,
-                QueryCompilationContext.Model,
-                QueryCompilationContext.Logger,
-                parameterize: true,
-                generateContextAccessors: false);
-
-            return visitor.ExtractParameters(query);
-            
-            /* With EF9 something along these lines would have been the ideal solution:
-            ExpressionTreeFuncletizer funcletizer = new(
+            // With EF10, ParameterExtractingExpressionVisitor was removed and replaced by ExpressionTreeFuncletizer
+            // ExpressionTreeFuncletizer now uses Dictionary<string, object?> instead of IParameterValues
+            var funcletizer = new ExpressionTreeFuncletizer(
                 QueryCompilationContext.Model,
                 Dependencies.EvaluatableExpressionFilter,
                 QueryCompilationContext.ContextType,
                 generateContextAccessors: false,
                 QueryCompilationContext.Logger);
 
-            return funcletizer.ExtractParameters(query, new ThrowOnParameterAccess(), parameterize: true, clearParameterizedValues: true);
-            */
+            var throwOnAccess = new ThrowOnParameterAccess();
+            var result = funcletizer.ExtractParameters(query, throwOnAccess, parameterize: true, clearParameterizedValues: true);
+
+            // Check if parameters were added by accessing the base Dictionary
+            // ExpressionTreeFuncletizer bypasses our 'new' method overrides because Dictionary<> is not designed
+            // to be subclassed, so we check the Count via the base class after funcletization completes
+            if (((Dictionary<string, object?>)throwOnAccess).Count > 0)
+            {
+                throw new InvalidOperationException(
+                    "Adding parameters in a cached query context is not allowed. " +
+                    $"Explicitly call .{nameof(ExpressionifyExtension.Expressionify)}() on the query or use {nameof(ExpressionEvaluationMode)}.{nameof(ExpressionEvaluationMode.FullCompatibilityButSlow)}.");
+            }
+
+            return result;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>")]
-        private class ThrowOnParameterAccess : IParameterValues
+        private class ThrowOnParameterAccess : Dictionary<string, object?>
         {
-            public void AddParameter(string name, object? value)
-                => throw new InvalidOperationException(
+            // This class exists primarily for documentation purposes - to make it clear that parameter
+            // access should throw an exception in cached mode. However, ExpressionTreeFuncletizer bypasses
+            // these 'new' method overrides by calling base Dictionary<> methods directly.
+            // The actual check happens in EvaluateExpression() after funcletization completes.
+
+            private static InvalidOperationException CreateException()
+                => new InvalidOperationException(
                     "Adding parameters in a cached query context is not allowed. " +
                     $"Explicitly call .{nameof(ExpressionifyExtension.Expressionify)}() on the query or use {nameof(ExpressionEvaluationMode)}.{nameof(ExpressionEvaluationMode.FullCompatibilityButSlow)}.");
 
-            public IReadOnlyDictionary<string, object?> ParameterValues
-                => throw new InvalidOperationException(
-                    "Accessing parameters in a cached query context is not allowed. " +
-                    $"Explicitly call .{nameof(ExpressionifyExtension.Expressionify)}() on the query or use {nameof(ExpressionEvaluationMode)}.{nameof(ExpressionEvaluationMode.FullCompatibilityButSlow)}.");
+            public new object? this[string key]
+            {
+                get => throw CreateException();
+                set => throw CreateException();
+            }
+
+            public new void Add(string key, object? value)
+                => throw CreateException();
+
+            public new bool TryAdd(string key, object? value)
+                => throw CreateException();
+
+            public new bool TryGetValue(string key, out object? value)
+                => throw CreateException();
+
+            public new bool ContainsKey(string key)
+                => throw CreateException();
+
+            public new int Count
+                => throw CreateException();
         }
     }
 }
