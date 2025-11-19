@@ -1,3 +1,34 @@
+## **10.0.0**&emsp;<sub><sup>2025-11-19 ([ba0427f...ba0427f](https://github.com/ClaveConsulting/Expressionify/compare/ba0427ffd6c2453538092f8ea503ba8af9499ba4...ba0427ffd6c2453538092f8ea503ba8af9499ba4?diff=split))</sup></sub>
+
+### Features
+
+- migrate to EF Core 10 and \.NET 10 \(\#40\) ([ba0427f](https://github.com/ClaveConsulting/Expressionify/commit/ba0427ffd6c2453538092f8ea503ba8af9499ba4))
+
+
+### BREAKING CHANGES
+-  Upgrade to EF Core 10 and \.NET 10 ([ba0427f](https://github.com/ClaveConsulting/Expressionify/commit/ba0427ffd6c2453538092f8ea503ba8af9499ba4))
+
+
+  This is a major version upgrade that requires:
+  \- \.NET 10 SDK
+  \- EF Core 10 packages
+  \- Updated parameter naming in generated SQL \(@\_\_p\_0 \-\> @p\)
+  
+  Core Changes:
+  \- Upgrade Microsoft\.EntityFrameworkCore from 9\.0\.0 to 10\.0\.0
+  \- Upgrade to \.NET 10 SDK and target framework \(net10\.0\)
+  \- Replace ParameterExtractingExpressionVisitor with ExpressionTreeFuncletizer
+  \- Remove IParameterValues interface \(replaced with Dictionary<string, object?\>\)
+  \- Delete ParameterExtractingExpressionVisitor\.cs \(~700 lines of internal EF Core code\)
+  \- Update parameter detection strategy to check dictionary count after funcletization
+  \- Update test expectations for simplified parameter naming
+  \- Remove obsolete test \(EF Core 10 optimizer handles constant folding\)
+  
+  All 51 tests passing\.
+  
+  Co\-authored\-by: Fabien Molinet <molinetf@medgate\.ch\>
+<br>
+
 ## **9.1.0**&emsp;<sub><sup>2025-03-21 ([579137a...579137a](https://github.com/ClaveConsulting/Expressionify/compare/579137a7550db48071b2a568718011031d3a3244...579137a7550db48071b2a568718011031d3a3244?diff=split))</sup></sub>
 
 ### Features
